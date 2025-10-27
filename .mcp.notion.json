@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "notion": {
+      "url": "http://localhost:3000",
+      "transport": "http",
+      "env": {
+        "NOTION_API_KEY": "ntn_Z98588360913ILBMZpPVZ6fGMeyJ6uXWxRKSm12FRFY4lN",
+        "Notion-Version": "2025-09-03"
+      }
+    }
+  }
+}

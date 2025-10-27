@@ -1,0 +1,5637 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: apps/sentiment_classification/uv.lock, apps/sentiment_classification/notebooks/*.ipynb, apps/sentiment_classification/data/*.csv
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+<additional_info>
+
+</additional_info>
+
+</file_summary>
+
+<directory_structure>
+.claude/
+  commands/
+    build.md
+    chore.md
+    clean_worktree.md
+    feature.md
+    implement.md
+    init_worktree.md
+    mark_in_progress.md
+    plan.md
+    prime.md
+    process_tasks.md
+    update_task.md
+adws/
+  adw_modules/
+    agent.py
+    data_models.py
+    utils.py
+  adw_triggers/
+    adw_trigger_cron_todone.py
+  adw_build_update_task.py
+  adw_chore_implement.py
+  adw_plan_implement_update_task.py
+  adw_prompt.py
+  adw_slash_command.py
+  README.md
+apps/
+  sentiment_classification/
+    .python-version
+    main.py
+    pyproject.toml
+    README.md
+specs/
+  plan-adw01-multi-agent-task-list.md
+.env.sample
+.gitignore
+README.md
+tasks.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".claude/commands/build.md">
+# Build Task
+
+Implement a task directly without creating a plan first.
+
+## Variables
+adw_id: $ARGUMENT
+task_description: $ARGUMENT
+
+## Instructions
+
+1. **Prime with Context**: First, read and execute `.claude/commands/prime.md` to understand the codebase
+2. **Analyze Task**: Carefully read and understand the task description
+3. **Implement Solution**: Think hard and then directly implement the solution for the task
+4. **Validate Work**: Ensure the implementation is complete and working
+5. **Report Results**: Summarize what was done
+
+## Setup Phase
+
+Before implementing the task:
+- Execute the prime command to understand the codebase structure
+- Read relevant documentation files (README.md, etc.)
+- Understand the existing patterns and conventions
+
+## Implementation Guidelines
+
+- Follow existing code patterns and conventions
+- Use the libraries and frameworks already in the codebase
+- Write clean, maintainable code
+- Add appropriate error handling
+- Follow security best practices
+
+## Task Description
+
+task_description
+
+## Expected Actions
+
+1. **Research**: Understand the codebase and task requirements
+2. **Implement**: Make the necessary changes to complete the task
+3. **Test**: Verify the implementation works as expected
+4. **Commit**: Create a meaningful commit with the changes
+
+## Report
+
+After completing the implementation:
+- Summarize the work done in clear bullet points
+- List all files created or modified
+- Report the total lines changed with `git diff --stat`
+- Note any important decisions or trade-offs made
+- Highlight any follow-up tasks that may be needed
+</file>
+
+<file path=".claude/commands/chore.md">
+# Chore Planning
+
+Create a plan to complete the chore using the specified markdown `Plan Format`. Research the codebase and create a thorough plan.
+
+## Variables
+adw_id: $ARGUMENT
+prompt: $ARGUMENT
+
+## Instructions
+
+- If the adw_id or prompt is not provided, stop and ask the user to provide them.
+- Create a plan to complete the chore described in the `prompt`
+- The plan should be simple, thorough, and precise
+- Create the plan in the `specs/` directory with filename: `chore-{adw_id}-{descriptive-name}.md`
+  - Replace `{descriptive-name}` with a short, descriptive name based on the chore (e.g., "update-readme", "add-logging", "refactor-agent")
+- Research the codebase starting with `README.md`
+- Replace every <placeholder> in the `Plan Format` with the requested value
+
+## Codebase Structure
+
+- `README.md` - Project overview and instructions (start here)
+- `adws/` - AI Developer Workflow scripts and modules
+- `apps/` - Applications Layer
+- `.claude/commands/` - Claude command templates
+- `specs/` - Specification and plan documents
+
+## Plan Format
+
+```md
+# Chore: <chore name>
+
+## Metadata
+adw_id: `{adw_id}`
+prompt: `{prompt}`
+
+## Chore Description
+<describe the chore in detail based on the prompt>
+
+## Relevant Files
+Use these files to complete the chore:
+
+<list files relevant to the chore with bullet points explaining why. Include new files to be created under an h3 'New Files' section if needed>
+
+## Step by Step Tasks
+IMPORTANT: Execute every step in order, top to bottom.
+
+<list step by step tasks as h3 headers with bullet points. Start with foundational changes then move to specific changes. Last step should validate the work>
+
+### 1. <First Task Name>
+- <specific action>
+- <specific action>
+
+### 2. <Second Task Name>
+- <specific action>
+- <specific action>
+
+## Validation Commands
+Execute these commands to validate the chore is complete:
+
+<list specific commands to validate the work. Be precise about what to run>
+- Example: `uv run python -m py_compile apps/*.py` - Test to ensure the code compiles
+
+## Notes
+<optional additional context or considerations>
+```
+
+## Chore
+Use the chore description from the `prompt` variable.
+
+## Report
+
+Return the path to the plan file created.
+</file>
+
+<file path=".claude/commands/clean_worktree.md">
+# Clean Worktree
+
+Remove a git worktree and its associated branch.
+
+## Variables
+worktree_name: $ARGUMENT
+
+## Instructions
+
+1. Check if the worktree exists
+2. Remove the worktree if it exists
+3. Prune worktree references
+4. Delete the associated branch if it exists
+5. Report the results
+
+## Cleanup Steps
+
+Execute these steps in order:
+
+1. **Check worktree status**:
+   ```bash
+   git worktree list
+   ```
+
+2. **Remove the worktree** (if exists):
+   ```bash
+   git worktree remove trees/<worktree_name> --force
+   ```
+   - Use `--force` to remove even if there are uncommitted changes
+   - This removes the worktree directory and its contents
+
+3. **Prune worktree references**:
+   ```bash
+   git worktree prune
+   ```
+   - Cleans up any stale worktree references
+
+4. **Check if branch exists**:
+   ```bash
+   git branch --list <worktree_name>
+   ```
+
+5. **Delete the branch** (if exists):
+   ```bash
+   git branch -D <worktree_name>
+   ```
+   - Use `-D` to force delete even if not fully merged
+   - Only delete if the branch exists
+
+6. **Verify cleanup**:
+   ```bash
+   # Verify worktree is gone
+   git worktree list | grep <worktree_name>
+   
+   # Verify branch is gone
+   git branch --list <worktree_name>
+   ```
+
+## Error Handling
+
+- If worktree doesn't exist, report and continue with branch cleanup
+- If branch doesn't exist, report that it's already clean
+- If removal fails due to permissions, report the error
+- Always run `git worktree prune` regardless of other steps
+
+## Expected Output
+
+Report one of the following:
+- Success: "Worktree '<worktree_name>' and branch cleaned up successfully"
+- Partial: "Worktree '<worktree_name>' removed, branch did not exist"
+- Already clean: "Worktree '<worktree_name>' does not exist"
+- Error: "Failed to clean worktree: <error message>"
+
+## Safety Checks
+
+Before removing:
+- List any uncommitted changes in the worktree
+- Show any unpushed commits on the branch
+- Confirm the worktree path is correct (trees/<worktree_name>)
+
+## Notes
+
+- This operation is destructive and cannot be undone
+- All uncommitted work in the worktree will be lost
+- The branch will be deleted even if it hasn't been merged
+- Use this after tasks are completed or to clean up failed attempts
+</file>
+
+<file path=".claude/commands/feature.md">
+# Feature Planning
+
+Create a plan to implement the feature using the specified markdown `Plan Format`. Research the codebase and create a thorough plan.
+
+## Variables
+adw_id: $ARGUMENT
+prompt: $ARGUMENT
+
+## Instructions
+
+- If the adw_id or prompt is not provided, stop and ask the user to provide them.
+- Create a plan to implement the feature described in the `prompt`
+- The plan should be comprehensive, well-designed, and follow existing patterns
+- Create the plan in the `specs/` directory with filename: `feature-{adw_id}-{descriptive-name}.md`
+  - Replace `{descriptive-name}` with a short, descriptive name based on the feature (e.g., "add-agent-logging", "implement-retry-logic", "create-workflow-api")
+- Research the codebase starting with `README.md`
+- Replace every <placeholder> in the `Plan Format` with the requested value
+- Use your reasoning model: THINK HARD about the feature requirements, design, and implementation approach
+- Follow existing patterns and conventions in the codebase
+- Design for extensibility and maintainability
+
+## Codebase Structure
+
+- `README.md` - Project overview and instructions (start here)
+- `adws/` - AI Developer Workflow scripts and modules
+- `apps/` - Application layer you'll be working in
+- `.claude/commands/` - Claude command templates
+- `specs/` - Specification and plan documents
+
+## Plan Format
+
+```md
+# Feature: <feature name>
+
+## Metadata
+adw_id: `{adw_id}`
+prompt: `{prompt}`
+
+## Feature Description
+<describe the feature in detail, including its purpose and value to users>
+
+## User Story
+As a <type of user>
+I want to <action/goal>
+So that <benefit/value>
+
+## Problem Statement
+<clearly define the specific problem or opportunity this feature addresses>
+
+## Solution Statement
+<describe the proposed solution approach and how it solves the problem>
+
+## Relevant Files
+Use these files to implement the feature:
+
+<list files relevant to the feature with bullet points explaining why. Include new files to be created under an h3 'New Files' section if needed>
+
+## Implementation Plan
+### Phase 1: Foundation
+<describe the foundational work needed before implementing the main feature>
+
+### Phase 2: Core Implementation
+<describe the main implementation work for the feature>
+
+### Phase 3: Integration
+<describe how the feature will integrate with existing functionality>
+
+## Step by Step Tasks
+IMPORTANT: Execute every step in order, top to bottom.
+
+<list step by step tasks as h3 headers with bullet points. Start with foundational changes then move to specific changes. Include creating tests throughout the implementation process>
+
+### 1. <First Task Name>
+- <specific action>
+- <specific action>
+
+### 2. <Second Task Name>
+- <specific action>
+- <specific action>
+
+<continue with additional tasks as needed>
+
+## Testing Strategy
+### Unit Tests
+<describe unit tests needed for the feature>
+
+### Edge Cases
+<list edge cases that need to be tested>
+
+## Acceptance Criteria
+<list specific, measurable criteria that must be met for the feature to be considered complete>
+
+## Validation Commands
+Execute these commands to validate the feature is complete:
+
+<list specific commands to validate the work. Be precise about what to run>
+- Example: `uv run python -m py_compile apps/*.py` - Test to ensure the code compiles
+
+
+## Notes
+<optional additional context, future considerations, or dependencies. If new libraries are needed, specify using `uv add`>
+```
+
+## Feature
+Use the feature description from the `prompt` variable.
+
+## Report
+
+Return the path to the plan file created.
+</file>
+
+<file path=".claude/commands/implement.md">
+# Implement the following plan
+Follow the `Instructions` to implement the `Plan` then `Report` the completed work.
+
+## Instructions
+- Read the plan, think hard about the plan and implement the plan.
+
+## Plan
+$ARGUMENT
+
+## Report
+- Summarize the work you've just done in a concise bullet point list.
+- Report the files and total lines changed with `git diff --stat`
+</file>
+
+<file path=".claude/commands/init_worktree.md">
+# Initialize Worktree with Sparse Checkout
+
+Create a new git worktree for an agent to work in isolation, with only the specified directory checked out.
+
+## Variables
+worktree_name: $ARGUMENT
+target_directory: $ARGUMENT
+
+## Instructions
+
+1. Create a new git worktree in the `trees/<worktree_name>` directory with sparse checkout
+2. Configure sparse checkout to only include `<target_directory>`
+3. Base the worktree on the main branch
+4. Copy the `.env` file from the root directory to the worktree (if it exists)
+5. Create an initial commit in the worktree to establish the branch
+6. Report the successful creation of the worktree
+
+## Git Worktree Setup with Sparse Checkout
+
+Execute these steps in order:
+
+1. **Create the trees directory** if it doesn't exist:
+   ```bash
+   mkdir -p trees
+   ```
+
+2. **Check if worktree already exists**:
+   - If `trees/<worktree_name>` already exists, report that it exists and stop
+   - Otherwise, proceed with creation
+
+3. **Create the git worktree without checkout**:
+   ```bash
+   git worktree add --no-checkout trees/<worktree_name> -b <worktree_name>
+   ```
+
+4. **Configure sparse checkout for the target directory**:
+   ```bash
+   cd trees/<worktree_name>
+   
+   # Initialize sparse checkout
+   git sparse-checkout init --cone
+   
+   # Set sparse checkout to only include the target directory
+   git sparse-checkout set <target_directory>
+   
+   # Now checkout the files
+   git checkout
+   ```
+
+5. **Copy environment file** (if exists):
+   Copy the .env from the root directory into `trees/<worktree_name>/<target_directory>/.env`
+
+6. **Create initial commit with no changes**:
+   ```bash
+   git commit --allow-empty -m "Initial worktree setup for <worktree_name> with sparse checkout of <target_directory>"
+   ```
+
+## Error Handling
+
+- If the worktree already exists, report this and exit gracefully
+- If git worktree creation fails, report the error
+- If sparse-checkout configuration fails, report the error
+- If .env doesn't exist in root or target directory, continue without error (it's optional)
+
+## Verification
+
+After setup, verify the sparse checkout is working:
+```bash
+cd trees/<worktree_name>
+ls -la  # Should only show <target_directory> directory (plus .git)
+git sparse-checkout list  # Should show: <target_directory>
+```
+
+## Report
+
+Report one of the following:
+- Success: "Worktree '<worktree_name>' created successfully at trees/<worktree_name> with only <target_directory> checked out"
+- Already exists: "Worktree '<worktree_name>' already exists at trees/<worktree_name>"
+- Error: "Failed to create worktree: <error message>"
+
+## Notes
+
+- Git worktrees with sparse checkout provide double isolation:
+  - **Worktree isolation**: Separate branch and working directory
+  - **Sparse checkout**: Only the relevant app directory is present
+- This reduces clutter and prevents accidental modifications to other apps
+- The agent only sees and works with `<target_directory>`
+- Full repository history is still available but only the specified directory is in the working tree
+- Each worktree maintains its own sparse-checkout configuration
+</file>
+
+<file path=".claude/commands/mark_in_progress.md">
+# Mark Task In Progress
+
+Mark tasks as in-progress in the task list file.
+
+## Variables
+task_file_path: $ARGUMENT
+worktree_name: $ARGUMENT
+task_description: $ARGUMENT
+adw_id: $ARGUMENT
+
+## Instructions
+
+1. Read the task file at `task_file_path`
+2. Locate the worktree section matching `worktree_name`
+3. Find the task matching `task_description` that has status `[]` or `[⏰]`
+4. Update the task status to `[🟡, <adw_id>]`
+5. Preserve all tags and formatting
+6. Write the updated content back to the file
+
+## Task Format
+
+Before:
+```
+[] <task_description> {optional_tags}
+```
+or
+```
+[⏰] <task_description> {optional_tags}
+```
+
+After:
+```
+[🟡, <adw_id>] <task_description> {optional_tags}
+```
+
+## Error Handling
+
+- If the task file doesn't exist, report error
+- If the worktree section is not found, report error
+- If the task is not found or already in progress, report error
+- Ensure atomic file write to prevent corruption
+
+## Report
+
+Report the following:
+- Task that was updated
+- New status with ADW ID
+- Success or failure of the operation
+</file>
+
+<file path=".claude/commands/plan.md">
+# Plan
+
+Create a plan to complete the task using the specified markdown `Plan Format`. Research the codebase and create a thorough plan appropriate to the task's complexity.
+
+## Variables
+adw_id: $ARGUMENT
+prompt: $ARGUMENT
+
+## Instructions
+
+- If the adw_id or prompt is not provided, stop and ask the user to provide them.
+- IMPORTANT: Create a plan to complete the task described in the `prompt`
+- The plan should be appropriately detailed based on the task complexity:
+  - Simple tasks (chores, fixes): Focus on specific changes and validation
+  - Complex tasks (features, refactors): Include design, phases, and testing strategy
+- Create the plan in the `specs/` directory with filename: `plan-{adw_id}-{descriptive-name}.md`
+  - Replace `{descriptive-name}` with a short, descriptive name based on the task (e.g., "update-readme", "add-logging", "implement-api", "refactor-agent")
+- Research the codebase starting with `README.md`
+- IMPORTANT: When you finish your plan, return only the path to the plan file created.
+- IMPORTANT: Replace every <placeholder> in the `Plan Format` with the requested value
+- Use your reasoning model: ULTRATHINK about the task requirements and appropriate level of planning needed
+- Follow existing patterns and conventions in the codebase
+
+## Codebase Structure
+
+- `README.md` - Project overview and instructions (start here)
+- `adws/` - AI Developer Workflow scripts and modules
+- `apps/` - Application layer you'll be working in
+- `.claude/commands/` - Claude command templates
+- `specs/` - Specification and plan documents
+
+## Plan Format
+
+```md
+# Plan: <task name>
+
+## Metadata
+adw_id: `{adw_id}`
+prompt: `{prompt}`
+task_type: <chore|feature|refactor|fix|enhancement>
+complexity: <simple|medium|complex>
+
+## Task Description
+<describe the task in detail based on the prompt>
+
+## Objective
+<clearly state what will be accomplished when this plan is complete>
+
+<if task_type is feature or complexity is medium/complex, include these sections:>
+## Problem Statement
+<clearly define the specific problem or opportunity this task addresses>
+
+## Solution Approach
+<describe the proposed solution approach and how it addresses the objective>
+</if>
+
+## Relevant Files
+Use these files to complete the task:
+
+<list files relevant to the task with bullet points explaining why. Include new files to be created under an h3 'New Files' section if needed>
+
+<if complexity is medium/complex, include this section:>
+## Implementation Phases
+### Phase 1: Foundation
+<describe any foundational work needed>
+
+### Phase 2: Core Implementation
+<describe the main implementation work>
+
+### Phase 3: Integration & Polish
+<describe integration, testing, and final touches>
+</if>
+
+## Step by Step Tasks
+IMPORTANT: Execute every step in order, top to bottom.
+
+<list step by step tasks as h3 headers with bullet points. Start with foundational changes then move to specific changes. Last step should validate the work>
+
+### 1. <First Task Name>
+- <specific action>
+- <specific action>
+
+### 2. <Second Task Name>
+- <specific action>
+- <specific action>
+
+<continue with additional tasks as needed>
+
+<if task_type is feature or complexity is medium/complex, include this section:>
+## Testing Strategy
+<describe testing approach, including unit tests and edge cases as applicable>
+</if>
+
+## Acceptance Criteria
+<list specific, measurable criteria that must be met for the task to be considered complete>
+
+## Validation Commands
+Execute these commands to validate the task is complete:
+
+<list specific commands to validate the work. Be precise about what to run>
+- Example: `uv run python -m py_compile apps/*.py` - Test to ensure the code compiles
+
+## Notes
+<optional additional context, considerations, or dependencies. If new libraries are needed, specify using `uv add`>
+```
+
+## Task
+Use the task description from the `prompt` variable.
+
+## Report
+
+IMPORTANT: Exclusively return the path to the plan file created.
+</file>
+
+<file path=".claude/commands/prime.md">
+# Prime
+Execute the `Run`, `Read` and `Report` sections to understand the codebase then summarize your understanding.
+
+## Run
+git ls-files
+
+## Read
+README.md
+adws/README.md
+
+## Report
+Summarize your understanding of the codebase.
+</file>
+
+<file path=".claude/commands/process_tasks.md">
+# Process Tasks
+
+Analyze the current task list and identify tasks that are ready to be picked up by agents.
+
+## Instructions
+
+1. Read the `tasks.md` file to understand the current state of all tasks
+2. Identify tasks that are eligible for pickup:
+   - Tasks with status `[]` (not started) are always eligible
+   - IMPORTANT: Tasks with status `[⏰]` (blocked) are eligible ONLY if ALL tasks above them in the same worktree have status `[✅]` (success)
+3. Group eligible tasks by their worktree
+4. Return a JSON array with the structure specified below
+5. DO NOT modify the task list - only analyze and return eligible tasks
+
+## Task Status Guide
+
+- `[]` - Not started (ready for pickup)
+- `[⏰]` - Not started and blocked (can only start when all tasks above in the worktree are successful)
+- `[🟡]` - Work in progress (skip these)
+- `[✅]` - Success (completed)
+- `[❌]` - Failed (terminal state)
+
+## Rules
+
+1. Only include worktrees that have eligible tasks
+2. IMPORTANT: For blocked tasks `[⏰]`, check that ALL tasks above them in the same worktree are successful aka `[✅]`
+3. Extract tags from task descriptions - tags are in the format `{tag1, tag2}`
+4. Return an empty array `[]` if no tasks are eligible
+5. Tasks are processed top to bottom within each worktree
+
+## Examples
+
+### Example 1: Task in progress blocks dependent task
+Given this task list:
+```
+## Git Worktree feature-auth
+[✅] Task 1
+[🟡] Task 2
+[] Task 3 {api, auth}
+[⏰] Task 4
+```
+
+The blocked task (Task 4) is NOT eligible because Task 2 is still in progress.
+Only Task 3 would be returned as eligible.
+
+### Example 2: Failed task prevents blocked task from running
+Given this task list:
+```
+## Git Worktree create-topic-filter
+[❌, 17d16d17] Generate filtered dataset at data/tweets_tech_topics.csv containing only technology and entertainment topics from tweets_v1.csv
+[⏰] Add 30 new tweets about sports and recreation to expand topic diversity in tweets_v1.csv
+```
+
+The blocked task (Add 30 new tweets) will NOT be eligible for pickup because the task above it failed. 
+Blocked tasks require ALL preceding tasks in the same worktree to be successful (`[✅]`) before they can run.
+No tasks would be returned as eligible from this worktree.
+
+## Task
+
+Read `tasks.md` and return eligible tasks in the specified JSON format.
+
+
+## Output Format
+
+IMPORTANT: Return a JSON array with this structure:
+
+```json
+[
+  {
+    "worktree_name": "worktree_name",
+    "tasks_to_start": [
+      {
+        "description": "task description",
+        "tags": ["tag1", "tag2"]
+      }
+    ]
+  }
+]
+```
+</file>
+
+<file path=".claude/commands/update_task.md">
+# Update Task
+
+Update the task list with the result of agent work.
+
+## Variables
+adw_id: $ARGUMENT
+worktree_name: $ARGUMENT
+task_description: $ARGUMENT
+status: $ARGUMENT
+commit_hash: $ARGUMENT
+error_message: $ARGUMENT
+
+## Instructions
+
+1. Read the current `tasks.md` file
+2. Find the task matching the provided `adw_id`, `worktree_name` and `task_description`
+3. Update the task status based on the result:
+   - If `status` is "success", update to `[✅ <commit_hash>, <adw_id>] <description>`
+   - If `status` is "failed", update to `[❌, <adw_id>] <description> // Failed: <error_message>`
+4. Preserve all other content and formatting in the file
+5. Write the updated content back to `tasks.md`
+
+## Task Update Rules
+
+1. **Success Status**:
+   - Format: `[✅ <commit_hash>, <adw_id>] <description>`
+   - Must include the git commit hash
+   - Example: `[✅ abc123def, adw_12345678] Implement user authentication`
+
+2. **Failed Status**:
+   - Format: `[❌, <adw_id>] <description> // Failed: <error_message>`
+   - Include the error message after `// Failed:` if provided
+   - If no error_message is provided, use format: `[❌, <adw_id>] <description>`
+   - Example: `[❌, adw_12345678] Implement user authentication // Failed: Module 'auth' not found`
+
+3. **Matching Tasks**:
+   - Find tasks with status `[🟡, <adw_id>]` in the specified worktree
+   - The adw_id must match exactly
+   - Only update the first matching task
+
+## Error Handling
+
+- If no matching task is found, report an error
+- If the task is not in progress status `[🟡]`, report an error
+- Ensure the file write is atomic to prevent corruption
+
+## File Format Preservation
+
+- Maintain exact formatting of the markdown file
+- Preserve whitespace and line breaks
+- Keep task descriptions unchanged
+- Retain any tags in the format `{tag1, tag2}`
+
+## Example Update
+
+Before:
+```
+## Git Worktree feature-auth
+[🟡, adw_12345678] Implement user authentication
+```
+
+After (success):
+```
+## Git Worktree feature-auth
+[✅ abc123def, adw_12345678] Implement user authentication
+```
+
+After (failure with error message):
+```
+## Git Worktree feature-auth
+[❌, adw_12345678] Implement user authentication // Failed: Tests failed with 3 errors
+```
+
+After (failure without error message):
+```
+## Git Worktree feature-auth
+[❌, adw_12345678] Implement user authentication
+```
+
+## Report
+
+After updating the task, report:
+- The task that was updated
+- The new status
+- Success or failure of the update operation
+</file>
+
+<file path="adws/adw_modules/agent.py">
+"""Claude Code agent module for executing prompts programmatically."""
+
+import subprocess
+import sys
+import os
+import json
+import re
+import logging
+import time
+import uuid
+from typing import Optional, List, Dict, Any, Tuple, Final, Literal
+from enum import Enum
+from pydantic import BaseModel
+from dotenv import load_dotenv
+
+
+# Retry codes for Claude Code execution errors
+class RetryCode(str, Enum):
+    """Codes indicating different types of errors that may be retryable."""
+    CLAUDE_CODE_ERROR = "claude_code_error"  # General Claude Code CLI error
+    TIMEOUT_ERROR = "timeout_error"  # Command timed out
+    EXECUTION_ERROR = "execution_error"  # Error during execution
+    ERROR_DURING_EXECUTION = "error_during_execution"  # Agent encountered an error
+    NONE = "none"  # No retry needed
+
+
+
+
+class AgentPromptRequest(BaseModel):
+    """Claude Code agent prompt configuration."""
+    prompt: str
+    adw_id: str
+    agent_name: str = "ops"
+    model: Literal["x-ai/grok-4-fast", "x-ai/grok-4"] = "x-ai/grok-4-fast"
+    dangerously_skip_permissions: bool = False
+    output_file: str
+    working_dir: Optional[str] = None
+
+
+class AgentPromptResponse(BaseModel):
+    """Claude Code agent response."""
+    output: str
+    success: bool
+    session_id: Optional[str] = None
+    retry_code: RetryCode = RetryCode.NONE
+
+
+class AgentTemplateRequest(BaseModel):
+    """Claude Code agent template execution request."""
+    agent_name: str
+    slash_command: str
+    args: List[str]
+    adw_id: str
+    model: Literal["x-ai/grok-4-fast", "x-ai/grok-4"] = "x-ai/grok-4-fast"
+    working_dir: Optional[str] = None
+
+
+class ClaudeCodeResultMessage(BaseModel):
+    """Claude Code JSONL result message (last line)."""
+    type: str
+    subtype: str
+    is_error: bool
+    duration_ms: int
+    duration_api_ms: int
+    num_turns: int
+    result: str
+    session_id: str
+    total_cost_usd: float
+
+
+def get_safe_subprocess_env() -> Dict[str, str]:
+    """Get filtered environment variables safe for subprocess execution.
+    
+    Returns only the environment variables needed based on .env.sample configuration.
+    
+    Returns:
+        Dictionary containing only required environment variables
+    """
+    safe_env_vars = {
+        # Anthropic Configuration (required)
+        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY"),
+        
+        # Claude Code Configuration
+        "CLAUDE_CODE_PATH": os.getenv("CLAUDE_CODE_PATH", "claude"),
+        "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": os.getenv(
+            "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR", "true"
+        ),
+        
+        # Essential system environment variables
+        "HOME": os.getenv("HOME"),
+        "USER": os.getenv("USER"),
+        "PATH": os.getenv("PATH"),
+        "SHELL": os.getenv("SHELL"),
+        "TERM": os.getenv("TERM"),
+        "LANG": os.getenv("LANG"),
+        "LC_ALL": os.getenv("LC_ALL"),
+        
+        # Python-specific variables that subprocesses might need
+        "PYTHONPATH": os.getenv("PYTHONPATH"),
+        "PYTHONUNBUFFERED": "1",  # Useful for subprocess output
+        
+        # Working directory tracking
+        "PWD": os.getcwd(),
+    }
+    
+    # Filter out None values
+    return {k: v for k, v in safe_env_vars.items() if v is not None}
+
+
+# Load environment variables
+load_dotenv()
+
+# Get Claude Code CLI path from environment
+CLAUDE_PATH = os.getenv("CLAUDE_CODE_PATH", "claude")
+
+# Output file name constants (matching adw_prompt.py and adw_slash_command.py)
+OUTPUT_JSONL = "cc_raw_output.jsonl"
+OUTPUT_JSON = "cc_raw_output.json"
+FINAL_OBJECT_JSON = "cc_final_object.json"
+SUMMARY_JSON = "custom_summary_output.json"
+
+
+def generate_short_id() -> str:
+    """Generate a short 8-character UUID for tracking."""
+    return str(uuid.uuid4())[:8]
+
+
+
+
+def truncate_output(
+    output: str, max_length: int = 500, suffix: str = "... (truncated)"
+) -> str:
+    """Truncate output to a reasonable length for display.
+
+    Special handling for JSONL data - if the output appears to be JSONL,
+    try to extract just the meaningful part.
+
+    Args:
+        output: The output string to truncate
+        max_length: Maximum length before truncation (default: 500)
+        suffix: Suffix to add when truncated (default: "... (truncated)")
+
+    Returns:
+        Truncated string if needed, original if shorter than max_length
+    """
+    # Check if this looks like JSONL data
+    if output.startswith('{"type":') and '\n{"type":' in output:
+        # This is likely JSONL output - try to extract the last meaningful message
+        lines = output.strip().split("\n")
+        for line in reversed(lines):
+            try:
+                data = json.loads(line)
+                # Look for result message
+                if data.get("type") == "result":
+                    result = data.get("result", "")
+                    if result:
+                        return truncate_output(result, max_length, suffix)
+                # Look for assistant message
+                elif data.get("type") == "assistant" and data.get("message"):
+                    content = data["message"].get("content", [])
+                    if isinstance(content, list) and content:
+                        text = content[0].get("text", "")
+                        if text:
+                            return truncate_output(text, max_length, suffix)
+            except:
+                pass
+        # If we couldn't extract anything meaningful, just show that it's JSONL
+        return f"[JSONL output with {len(lines)} messages]{suffix}"
+
+    # Regular truncation logic
+    if len(output) <= max_length:
+        return output
+
+    # Try to find a good break point (newline or space)
+    truncate_at = max_length - len(suffix)
+
+    # Look for newline near the truncation point
+    newline_pos = output.rfind("\n", truncate_at - 50, truncate_at)
+    if newline_pos > 0:
+        return output[:newline_pos] + suffix
+
+    # Look for space near the truncation point
+    space_pos = output.rfind(" ", truncate_at - 20, truncate_at)
+    if space_pos > 0:
+        return output[:space_pos] + suffix
+
+    # Just truncate at the limit
+    return output[:truncate_at] + suffix
+
+
+def check_claude_installed() -> Optional[str]:
+    """Check if Claude Code CLI is installed. Return error message if not."""
+    try:
+        result = subprocess.run(
+            [CLAUDE_PATH, "-v"], capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            return (
+                f"Error: Claude Code CLI is not installed. Expected at: {CLAUDE_PATH}"
+            )
+    except FileNotFoundError:
+        return f"Error: Claude Code CLI is not installed. Expected at: {CLAUDE_PATH}"
+    return None
+
+
+def parse_jsonl_output(
+    output_file: str,
+) -> Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]:
+    """Parse JSONL output file and return all messages and the result message.
+
+    Returns:
+        Tuple of (all_messages, result_message) where result_message is None if not found
+    """
+    try:
+        with open(output_file, "r") as f:
+            # Read all lines and parse each as JSON
+            messages = [json.loads(line) for line in f if line.strip()]
+
+            # Find the result message (should be the last one)
+            result_message = None
+            for message in reversed(messages):
+                if message.get("type") == "result":
+                    result_message = message
+                    break
+
+            return messages, result_message
+    except Exception as e:
+        return [], None
+
+
+def convert_jsonl_to_json(jsonl_file: str) -> str:
+    """Convert JSONL file to JSON array file.
+
+    Creates a cc_raw_output.json file in the same directory as the JSONL file,
+    containing all messages as a JSON array.
+
+    Returns:
+        Path to the created JSON file
+    """
+    # Create JSON filename in the same directory
+    output_dir = os.path.dirname(jsonl_file)
+    json_file = os.path.join(output_dir, OUTPUT_JSON)
+
+    # Parse the JSONL file
+    messages, _ = parse_jsonl_output(jsonl_file)
+
+    # Write as JSON array
+    with open(json_file, "w") as f:
+        json.dump(messages, f, indent=2)
+
+    return json_file
+
+
+def save_last_entry_as_raw_result(json_file: str) -> Optional[str]:
+    """Save the last entry from a JSON array file as cc_final_object.json.
+    
+    Args:
+        json_file: Path to the JSON array file
+        
+    Returns:
+        Path to the created cc_final_object.json file, or None if error
+    """
+    try:
+        # Read the JSON array
+        with open(json_file, "r") as f:
+            messages = json.load(f)
+        
+        if not messages:
+            return None
+            
+        # Get the last entry
+        last_entry = messages[-1]
+        
+        # Create cc_final_object.json in the same directory
+        output_dir = os.path.dirname(json_file)
+        final_object_file = os.path.join(output_dir, FINAL_OBJECT_JSON)
+        
+        # Write the last entry
+        with open(final_object_file, "w") as f:
+            json.dump(last_entry, f, indent=2)
+            
+        return final_object_file
+    except Exception:
+        # Silently fail - this is a nice-to-have feature
+        return None
+
+
+def get_claude_env() -> Dict[str, str]:
+    """Get only the required environment variables for Claude Code execution.
+
+    This is a wrapper around get_safe_subprocess_env() for
+    backward compatibility. New code should use get_safe_subprocess_env() directly.
+
+    Returns a dictionary containing only the necessary environment variables
+    based on .env.sample configuration.
+    """
+    # Use the function defined above
+    return get_safe_subprocess_env()
+
+
+def save_prompt(prompt: str, adw_id: str, agent_name: str = "ops") -> None:
+    """Save a prompt to the appropriate logging directory."""
+    # Extract slash command from prompt
+    match = re.match(r"^(/\w+)", prompt)
+    if not match:
+        return
+
+    slash_command = match.group(1)
+    # Remove leading slash for filename
+    command_name = slash_command[1:]
+
+    # Create directory structure at project root (parent of adws)
+    # __file__ is in adws/adw_modules/, so we need to go up 3 levels to get to project root
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
+    prompt_dir = os.path.join(project_root, "agents", adw_id, agent_name, "prompts")
+    os.makedirs(prompt_dir, exist_ok=True)
+
+    # Save prompt to file
+    prompt_file = os.path.join(prompt_dir, f"{command_name}.txt")
+    with open(prompt_file, "w") as f:
+        f.write(prompt)
+
+
+def prompt_claude_code_with_retry(
+    request: AgentPromptRequest,
+    max_retries: int = 3,
+    retry_delays: List[int] = None,
+) -> AgentPromptResponse:
+    """Execute Claude Code with retry logic for certain error types.
+
+    Args:
+        request: The prompt request configuration
+        max_retries: Maximum number of retry attempts (default: 3)
+        retry_delays: List of delays in seconds between retries (default: [1, 3, 5])
+
+    Returns:
+        AgentPromptResponse with output and retry code
+    """
+    if retry_delays is None:
+        retry_delays = [1, 3, 5]
+
+    # Ensure we have enough delays for max_retries
+    while len(retry_delays) < max_retries:
+        retry_delays.append(retry_delays[-1] + 2)  # Add incrementing delays
+
+    last_response = None
+
+    for attempt in range(max_retries + 1):  # +1 for initial attempt
+        if attempt > 0:
+            # This is a retry
+            delay = retry_delays[attempt - 1]
+            time.sleep(delay)
+
+        response = prompt_claude_code(request)
+        last_response = response
+
+        # Check if we should retry based on the retry code
+        if response.success or response.retry_code == RetryCode.NONE:
+            # Success or non-retryable error
+            return response
+
+        # Check if this is a retryable error
+        if response.retry_code in [
+            RetryCode.CLAUDE_CODE_ERROR,
+            RetryCode.TIMEOUT_ERROR,
+            RetryCode.EXECUTION_ERROR,
+            RetryCode.ERROR_DURING_EXECUTION,
+        ]:
+            if attempt < max_retries:
+                continue
+            else:
+                return response
+
+    # Should not reach here, but return last response just in case
+    return last_response
+
+
+def prompt_claude_code(request: AgentPromptRequest) -> AgentPromptResponse:
+    """Execute Claude Code with the given prompt configuration."""
+
+    # Check if Claude Code CLI is installed
+    error_msg = check_claude_installed()
+    if error_msg:
+        return AgentPromptResponse(
+            output=error_msg,
+            success=False,
+            session_id=None,
+            retry_code=RetryCode.NONE,  # Installation error is not retryable
+        )
+
+    # Save prompt before execution
+    save_prompt(request.prompt, request.adw_id, request.agent_name)
+
+    # Create output directory if needed
+    output_dir = os.path.dirname(request.output_file)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
+    # Build command - always use stream-json format and verbose
+    cmd = [CLAUDE_PATH, "code", "-p", request.prompt]
+    cmd.extend(["--model", request.model])
+    cmd.extend(["--output-format", "stream-json"])
+    cmd.append("--verbose")
+
+    # Check for MCP config in working directory
+    if request.working_dir:
+        mcp_config_path = os.path.join(request.working_dir, ".mcp.json")
+        if os.path.exists(mcp_config_path):
+            cmd.extend(["--mcp-config", mcp_config_path])
+
+    # Add dangerous skip permissions flag if enabled
+    if request.dangerously_skip_permissions:
+        cmd.append("--dangerously-skip-permissions")
+
+    # Set up environment with only required variables
+    env = get_claude_env()
+
+    try:
+        # Open output file for streaming
+        with open(request.output_file, "w") as output_f:
+            # Execute Claude Code and stream output to file
+            result = subprocess.run(
+                cmd,
+                stdout=output_f,  # Stream directly to file
+                stderr=subprocess.PIPE,
+                text=True,
+                env=env,
+                cwd=request.working_dir,  # Use working_dir if provided
+            )
+
+        if result.returncode == 0:
+
+            # Parse the JSONL file
+            messages, result_message = parse_jsonl_output(request.output_file)
+
+            # Convert JSONL to JSON array file
+            json_file = convert_jsonl_to_json(request.output_file)
+            
+            # Save the last entry as raw_result.json
+            save_last_entry_as_raw_result(json_file)
+
+            if result_message:
+                # Extract session_id from result message
+                session_id = result_message.get("session_id")
+
+                # Check if there was an error in the result
+                is_error = result_message.get("is_error", False)
+                subtype = result_message.get("subtype", "")
+
+                # Handle error_during_execution case where there's no result field
+                if subtype == "error_during_execution":
+                    error_msg = "Error during execution: Agent encountered an error and did not return a result"
+                    return AgentPromptResponse(
+                        output=error_msg,
+                        success=False,
+                        session_id=session_id,
+                        retry_code=RetryCode.ERROR_DURING_EXECUTION,
+                    )
+
+                result_text = result_message.get("result", "")
+
+                # For error cases, truncate the output to prevent JSONL blobs
+                if is_error and len(result_text) > 1000:
+                    result_text = truncate_output(result_text, max_length=800)
+
+                return AgentPromptResponse(
+                    output=result_text,
+                    success=not is_error,
+                    session_id=session_id,
+                    retry_code=RetryCode.NONE,  # No retry needed for successful or non-retryable errors
+                )
+            else:
+                # No result message found, try to extract meaningful error
+                error_msg = "No result message found in Claude Code output"
+
+                # Try to get the last few lines of output for context
+                try:
+                    with open(request.output_file, "r") as f:
+                        lines = f.readlines()
+                        if lines:
+                            # Get last 5 lines or less
+                            last_lines = lines[-5:] if len(lines) > 5 else lines
+                            # Try to parse each as JSON to find any error messages
+                            for line in reversed(last_lines):
+                                try:
+                                    data = json.loads(line.strip())
+                                    if data.get("type") == "assistant" and data.get(
+                                        "message"
+                                    ):
+                                        # Extract text from assistant message
+                                        content = data["message"].get("content", [])
+                                        if isinstance(content, list) and content:
+                                            text = content[0].get("text", "")
+                                            if text:
+                                                error_msg = f"Claude Code output: {text[:500]}"  # Truncate
+                                                break
+                                except:
+                                    pass
+                except:
+                    pass
+
+                return AgentPromptResponse(
+                    output=truncate_output(error_msg, max_length=800),
+                    success=False,
+                    session_id=None,
+                    retry_code=RetryCode.NONE,
+                )
+        else:
+            # Error occurred - stderr is captured, stdout went to file
+            stderr_msg = result.stderr.strip() if result.stderr else ""
+
+            # Try to read the output file to check for errors in stdout
+            stdout_msg = ""
+            error_from_jsonl = None
+            try:
+                if os.path.exists(request.output_file):
+                    # Parse JSONL to find error message
+                    messages, result_message = parse_jsonl_output(request.output_file)
+
+                    if result_message and result_message.get("is_error"):
+                        # Found error in result message
+                        error_from_jsonl = result_message.get("result", "Unknown error")
+                    elif messages:
+                        # Look for error in last few messages
+                        for msg in reversed(messages[-5:]):
+                            if msg.get("type") == "assistant" and msg.get(
+                                "message", {}
+                            ).get("content"):
+                                content = msg["message"]["content"]
+                                if isinstance(content, list) and content:
+                                    text = content[0].get("text", "")
+                                    if text and (
+                                        "error" in text.lower()
+                                        or "failed" in text.lower()
+                                    ):
+                                        error_from_jsonl = text[:500]  # Truncate
+                                        break
+
+                    # If no structured error found, get last line only
+                    if not error_from_jsonl:
+                        with open(request.output_file, "r") as f:
+                            lines = f.readlines()
+                            if lines:
+                                # Just get the last line instead of entire file
+                                stdout_msg = lines[-1].strip()[
+                                    :200
+                                ]  # Truncate to 200 chars
+            except:
+                pass
+
+            if error_from_jsonl:
+                error_msg = f"Claude Code error: {error_from_jsonl}"
+            elif stdout_msg and not stderr_msg:
+                error_msg = f"Claude Code error: {stdout_msg}"
+            elif stderr_msg and not stdout_msg:
+                error_msg = f"Claude Code error: {stderr_msg}"
+            elif stdout_msg and stderr_msg:
+                error_msg = f"Claude Code error: {stderr_msg}\nStdout: {stdout_msg}"
+            else:
+                error_msg = f"Claude Code error: Command failed with exit code {result.returncode}"
+
+            # Always truncate error messages to prevent huge outputs
+            return AgentPromptResponse(
+                output=truncate_output(error_msg, max_length=800),
+                success=False,
+                session_id=None,
+                retry_code=RetryCode.CLAUDE_CODE_ERROR,
+            )
+
+    except subprocess.TimeoutExpired:
+        error_msg = "Error: Claude Code command timed out after 5 minutes"
+        return AgentPromptResponse(
+            output=error_msg,
+            success=False,
+            session_id=None,
+            retry_code=RetryCode.TIMEOUT_ERROR,
+        )
+    except Exception as e:
+        error_msg = f"Error executing Claude Code: {e}"
+        return AgentPromptResponse(
+            output=error_msg,
+            success=False,
+            session_id=None,
+            retry_code=RetryCode.EXECUTION_ERROR,
+        )
+
+
+def execute_template(request: AgentTemplateRequest) -> AgentPromptResponse:
+    """Execute a Claude Code template with slash command and arguments.
+
+    Example:
+        request = AgentTemplateRequest(
+            agent_name="planner",
+            slash_command="/implement",
+            args=["plan.md"],
+            adw_id="abc12345",
+            model="x-ai/grok-4-fast"  # Explicitly set model
+        )
+        response = execute_template(request)
+    """
+
+    # Construct prompt from slash command and args
+    prompt = f"{request.slash_command} {' '.join(request.args)}"
+
+    # Create output directory with adw_id at project root
+    # __file__ is in adws/adw_modules/, so we need to go up 3 levels to get to project root
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
+    output_dir = os.path.join(
+        project_root, "agents", request.adw_id, request.agent_name
+    )
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Build output file path
+    output_file = os.path.join(output_dir, OUTPUT_JSONL)
+
+    # Create prompt request with specific parameters
+    prompt_request = AgentPromptRequest(
+        prompt=prompt,
+        adw_id=request.adw_id,
+        agent_name=request.agent_name,
+        model=request.model,
+        dangerously_skip_permissions=True,
+        output_file=output_file,
+        working_dir=request.working_dir,  # Pass through working_dir
+    )
+
+    # Execute with retry logic and return response (prompt_claude_code now handles all parsing)
+    return prompt_claude_code_with_retry(prompt_request)
+</file>
+
+<file path="adws/adw_modules/data_models.py">
+"""
+Data models for the multi-agent task list architecture.
+
+These models define the structure for tasks, worktrees, and workflow states
+used throughout the ToDone system.
+"""
+
+from typing import List, Optional, Literal
+from datetime import datetime
+from enum import Enum
+from pydantic import BaseModel, Field, validator
+
+
+class SystemTag(str, Enum):
+    """System-defined tags that control task execution behavior."""
+
+    # Workflow selection tags
+    PLAN_IMPLEMENT_UPDATE = "adw_plan_implement_update_task"
+
+    # Model selection tags
+    THINKING = "x-ai/grok-4"
+    FAST = "x-ai/grok-4-fast"
+
+    @classmethod
+    def get_workflow_tags(cls) -> List[str]:
+        """Get all workflow-related tags."""
+        return [cls.PLAN_IMPLEMENT_UPDATE]
+
+    @classmethod
+    def get_model_tags(cls) -> List[str]:
+        """Get all model-related tags."""
+        return [cls.THINKING, cls.FAST]
+
+    @classmethod
+    def extract_model_from_tags(cls, tags: List[str]) -> Optional[str]:
+        """Extract the model to use from tags.
+
+        Priority: THINKING > FAST > default (None)
+        """
+        if cls.THINKING in tags:
+            return "x-ai/grok-4"
+        elif cls.FAST in tags:
+            return "x-ai/grok-4-fast"
+        return None
+
+    @classmethod
+    def extract_workflow_from_tags(cls, tags: List[str]) -> bool:
+        """Check if full workflow should be used based on tags."""
+        return cls.PLAN_IMPLEMENT_UPDATE in tags
+
+
+class Task(BaseModel):
+    """Represents a single task in the task list."""
+
+    description: str = Field(..., description="The task description")
+    status: Literal["[]", "[⏰]", "[🟡]", "[✅]", "[❌]"] = Field(
+        default="[]", description="Current status of the task"
+    )
+    adw_id: Optional[str] = Field(
+        None, description="ADW ID assigned when task is picked up"
+    )
+    commit_hash: Optional[str] = Field(
+        None, description="Git commit hash when task is completed"
+    )
+    tags: List[str] = Field(
+        default_factory=list, description="Optional tags for the task"
+    )
+    worktree_name: Optional[str] = Field(
+        None, description="Associated git worktree name"
+    )
+
+    @validator("status")
+    def validate_status(cls, v):
+        """Ensure status is one of the valid values."""
+        valid_statuses = ["[]", "[⏰]", "[🟡]", "[✅]", "[❌]"]
+        if v not in valid_statuses:
+            raise ValueError(f"Status must be one of {valid_statuses}")
+        return v
+
+    def is_eligible_for_pickup(self) -> bool:
+        """Check if task can be picked up by an agent."""
+        return self.status in ["[]", "[⏰]"]
+
+    def is_completed(self) -> bool:
+        """Check if task is in a terminal state."""
+        return self.status in ["[✅]", "[❌]"]
+
+
+class Worktree(BaseModel):
+    """Represents a git worktree section in the task list."""
+
+    name: str = Field(..., description="Name of the git worktree")
+    tasks: List[Task] = Field(
+        default_factory=list, description="Tasks in this worktree"
+    )
+
+    def get_eligible_tasks(self) -> List[Task]:
+        """Get all tasks eligible for pickup, considering blocking rules."""
+        eligible = []
+
+        for i, task in enumerate(self.tasks):
+            if task.status == "[]":
+                # Non-blocked tasks are always eligible
+                eligible.append(task)
+            elif task.status == "[⏰]":
+                # Blocked tasks are eligible only if all tasks above are successful
+                all_above_successful = all(t.status == "[✅]" for t in self.tasks[:i])
+                if all_above_successful:
+                    eligible.append(task)
+
+        return eligible
+
+
+class TaskToStart(BaseModel):
+    """Task ready to be started by an agent."""
+
+    description: str = Field(..., description="The task description")
+    tags: List[str] = Field(
+        default_factory=list, description="Optional tags for the task"
+    )
+
+
+class WorktreeTaskGroup(BaseModel):
+    """Groups tasks by worktree for processing."""
+
+    worktree_name: str = Field(..., description="Name of the git worktree")
+    tasks_to_start: List[TaskToStart] = Field(
+        ..., description="Tasks ready to be started in this worktree"
+    )
+
+
+class ProcessTasksResponse(BaseModel):
+    """Response from the /process_tasks command."""
+
+    task_groups: List[WorktreeTaskGroup] = Field(
+        default_factory=list, description="Tasks grouped by worktree"
+    )
+
+    def has_tasks(self) -> bool:
+        """Check if there are any tasks to process."""
+        return any(len(group.tasks_to_start) > 0 for group in self.task_groups)
+
+
+class TaskUpdate(BaseModel):
+    """Update information for a task after agent processing."""
+
+    adw_id: str = Field(..., description="ADW ID of the task")
+    status: Literal["[✅]", "[❌]"] = Field(..., description="Final status of the task")
+    commit_hash: Optional[str] = Field(
+        None, description="Git commit hash if successful"
+    )
+    error_message: Optional[str] = Field(None, description="Error message if failed")
+    worktree_name: str = Field(..., description="Worktree where task was executed")
+    task_description: str = Field(..., description="Original task description")
+
+    @validator("status")
+    def validate_final_status(cls, v):
+        """Ensure status is a terminal state."""
+        if v not in ["[✅]", "[❌]"]:
+            raise ValueError("Task update status must be either [✅] or [❌]")
+        return v
+
+    @validator("commit_hash")
+    def validate_commit_hash(cls, v, values):
+        """Ensure commit hash is provided for successful tasks."""
+        if values.get("status") == "[✅]" and not v:
+            raise ValueError("Commit hash is required for successful tasks")
+        return v
+
+
+class WorkflowState(BaseModel):
+    """Tracks the state of a workflow execution."""
+
+    adw_id: str = Field(..., description="Unique ADW ID for this workflow")
+    worktree_name: str = Field(..., description="Git worktree name")
+    task_description: str = Field(..., description="Task being processed")
+    phase: Literal["planning", "implementing", "updating", "completed", "failed"] = (
+        Field(..., description="Current phase of the workflow")
+    )
+    started_at: datetime = Field(
+        default_factory=datetime.now, description="Workflow start time"
+    )
+    completed_at: Optional[datetime] = Field(
+        None, description="Workflow completion time"
+    )
+    plan_path: Optional[str] = Field(None, description="Path to generated plan file")
+    error: Optional[str] = Field(None, description="Error message if workflow failed")
+
+    def mark_completed(self, success: bool = True, error: Optional[str] = None):
+        """Mark workflow as completed."""
+        self.completed_at = datetime.now()
+        self.phase = "completed" if success else "failed"
+        if error:
+            self.error = error
+
+
+class CronTriggerConfig(BaseModel):
+    """Configuration for the cron trigger."""
+
+    polling_interval: int = Field(
+        default=5, ge=1, description="Polling interval in seconds"
+    )
+    dry_run: bool = Field(
+        default=False, description="Run in dry-run mode without making changes"
+    )
+    max_concurrent_tasks: int = Field(
+        default=5, ge=1, description="Maximum number of concurrent tasks to process"
+    )
+    task_file_path: str = Field(
+        default="tasks.md", description="Path to the task list file"
+    )
+    worktree_base_path: str = Field(
+        default="trees", description="Base directory for git worktrees"
+    )
+
+
+class WorktreeConfig(BaseModel):
+    """Configuration for creating a new worktree."""
+
+    worktree_name: str = Field(..., description="Name of the worktree to create")
+    base_branch: str = Field(
+        default="main", description="Base branch to create worktree from"
+    )
+    copy_env: bool = Field(
+        default=True, description="Whether to copy .env file to worktree"
+    )
+</file>
+
+<file path="adws/adw_modules/utils.py">
+"""Utility functions for ADW system."""
+
+import json
+import logging
+import os
+import re
+import sys
+import uuid
+from datetime import datetime
+from typing import Any, TypeVar, Type, Union, Dict, Optional
+
+T = TypeVar("T")
+
+
+def make_adw_id() -> str:
+    """Generate a short 8-character UUID for ADW tracking."""
+    return str(uuid.uuid4())[:8]
+
+
+def setup_logger(adw_id: str, trigger_type: str = "adw_plan_build") -> logging.Logger:
+    """Set up logger that writes to both console and file using adw_id.
+
+    Args:
+        adw_id: The ADW workflow ID
+        trigger_type: Type of trigger (adw_plan_build, trigger_webhook, etc.)
+
+    Returns:
+        Configured logger instance
+    """
+    # Create log directory: agents/{adw_id}/adw_plan_build/
+    # __file__ is in adws/adw_modules/, so we need to go up 3 levels to get to project root
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
+    log_dir = os.path.join(project_root, "agents", adw_id, trigger_type)
+    os.makedirs(log_dir, exist_ok=True)
+
+    # Log file path: agents/{adw_id}/adw_plan_build/execution.log
+    log_file = os.path.join(log_dir, "execution.log")
+
+    # Create logger with unique name using adw_id
+    logger = logging.getLogger(f"adw_{adw_id}")
+    logger.setLevel(logging.DEBUG)
+
+    # Clear any existing handlers to avoid duplicates
+    logger.handlers.clear()
+
+    # File handler - captures everything
+    file_handler = logging.FileHandler(log_file, mode="a")
+    file_handler.setLevel(logging.DEBUG)
+
+    # Console handler - INFO and above
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+
+    # Format with timestamp for file
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    )
+
+    # Simpler format for console (similar to current print statements)
+    console_formatter = logging.Formatter("%(message)s")
+
+    file_handler.setFormatter(file_formatter)
+    console_handler.setFormatter(console_formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    # Log initial setup message
+    logger.info(f"ADW Logger initialized - ID: {adw_id}")
+    logger.debug(f"Log file: {log_file}")
+
+    return logger
+
+
+def get_logger(adw_id: str) -> logging.Logger:
+    """Get existing logger by ADW ID.
+
+    Args:
+        adw_id: The ADW workflow ID
+
+    Returns:
+        Logger instance
+    """
+    return logging.getLogger(f"adw_{adw_id}")
+
+
+def parse_json(text: str, target_type: Type[T] = None) -> Union[T, Any]:
+    """Parse JSON that may be wrapped in markdown code blocks.
+
+    Handles various formats:
+    - Raw JSON
+    - JSON wrapped in ```json ... ```
+    - JSON wrapped in ``` ... ```
+    - JSON with extra whitespace or newlines
+
+    Args:
+        text: String containing JSON, possibly wrapped in markdown
+        target_type: Optional type to validate/parse the result into (e.g., List[TestResult])
+
+    Returns:
+        Parsed JSON object, optionally validated as target_type
+
+    Raises:
+        ValueError: If JSON cannot be parsed from the text
+    """
+    # Try to extract JSON from markdown code blocks
+    # Pattern matches ```json\n...\n``` or ```\n...\n```
+    code_block_pattern = r"```(?:json)?\s*\n(.*?)\n```"
+    match = re.search(code_block_pattern, text, re.DOTALL)
+
+    if match:
+        json_str = match.group(1).strip()
+    else:
+        # No code block found, try to parse the entire text
+        json_str = text.strip()
+
+    # Try to find JSON array or object boundaries if not already clean
+    if not (json_str.startswith("[") or json_str.startswith("{")):
+        # Look for JSON array
+        array_start = json_str.find("[")
+        array_end = json_str.rfind("]")
+
+        # Look for JSON object
+        obj_start = json_str.find("{")
+        obj_end = json_str.rfind("}")
+
+        # Determine which comes first and extract accordingly
+        if array_start != -1 and (obj_start == -1 or array_start < obj_start):
+            if array_end != -1:
+                json_str = json_str[array_start : array_end + 1]
+        elif obj_start != -1:
+            if obj_end != -1:
+                json_str = json_str[obj_start : obj_end + 1]
+
+    try:
+        result = json.loads(json_str)
+
+        # If target_type is provided and has from_dict/parse_obj/model_validate methods (Pydantic)
+        if target_type and hasattr(target_type, "__origin__"):
+            # Handle List[SomeType] case
+            if target_type.__origin__ == list:
+                item_type = target_type.__args__[0]
+                # Try Pydantic v2 first, then v1
+                if hasattr(item_type, "model_validate"):
+                    result = [item_type.model_validate(item) for item in result]
+                elif hasattr(item_type, "parse_obj"):
+                    result = [item_type.parse_obj(item) for item in result]
+        elif target_type:
+            # Handle single Pydantic model
+            if hasattr(target_type, "model_validate"):
+                result = target_type.model_validate(result)
+            elif hasattr(target_type, "parse_obj"):
+                result = target_type.parse_obj(result)
+
+        return result
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Failed to parse JSON: {e}. Text was: {json_str[:200]}...")
+
+
+def check_env_vars(logger: Optional[logging.Logger] = None) -> None:
+    """Check that all required environment variables are set.
+
+    Args:
+        logger: Optional logger instance for error reporting
+
+    Raises:
+        SystemExit: If required environment variables are missing
+    """
+    required_vars = [
+        "ANTHROPIC_API_KEY",
+        "CLAUDE_CODE_PATH",
+    ]
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+
+    if missing_vars:
+        error_msg = "Error: Missing required environment variables:"
+        if logger:
+            logger.error(error_msg)
+            for var in missing_vars:
+                logger.error(f"  - {var}")
+        else:
+            print(error_msg, file=sys.stderr)
+            for var in missing_vars:
+                print(f"  - {var}", file=sys.stderr)
+        sys.exit(1)
+
+
+def format_agent_status(action: str, adw_id: str, worktree: str, phase: str = None) -> str:
+    """Format a status message for agent operations with visibility into ADW ID and branch.
+    
+    Args:
+        action: The action being performed (e.g., "Building solution", "Creating plan")
+        adw_id: The ADW ID for tracking
+        worktree: The worktree/branch name
+        phase: Optional phase name (e.g., "build", "plan", "implement")
+    
+    Returns:
+        Formatted status message with ADW ID and branch visibility
+    """
+    # Format the ADW ID (first 6 chars for brevity)
+    short_id = adw_id[:6] if len(adw_id) > 6 else adw_id
+    
+    # Build the status components
+    components = [
+        f"[bold yellow]{action}[/bold yellow]",
+        f"[dim]({short_id}@{worktree}",
+    ]
+    
+    if phase:
+        components[1] += f" • {phase}"
+    
+    components[1] += ")[/dim]"
+    
+    return " ".join(components)
+
+
+def format_worktree_status(action: str, worktree: str, adw_id: str = None) -> str:
+    """Format a status message specifically for worktree operations.
+    
+    Args:
+        action: The action being performed (e.g., "Creating", "Initializing")
+        worktree: The worktree name
+        adw_id: Optional ADW ID for tracking
+    
+    Returns:
+        Formatted status message for worktree operations
+    """
+    base_msg = f"[bold yellow]{action} worktree '{worktree}'[/bold yellow]"
+    
+    if adw_id:
+        short_id = adw_id[:6] if len(adw_id) > 6 else adw_id
+        base_msg += f" [dim]({short_id})[/dim]"
+    
+    return base_msg
+
+
+def get_safe_subprocess_env() -> Dict[str, str]:
+    """Get filtered environment variables safe for subprocess execution.
+
+    Returns only the environment variables needed for ADW workflows based on
+    .env.sample configuration. This prevents accidental exposure of sensitive
+    credentials to subprocesses.
+
+    Returns:
+        Dictionary containing only required environment variables
+    """
+    safe_env_vars = {
+        # Anthropic Configuration (required)
+        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY"),
+        # GitHub Configuration (optional)
+        # GITHUB_PAT is optional - if not set, will use default gh auth
+        "GITHUB_PAT": os.getenv("GITHUB_PAT"),
+        # Claude Code Configuration
+        "CLAUDE_CODE_PATH": os.getenv("CLAUDE_CODE_PATH", "claude"),
+        "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": os.getenv(
+            "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR", "true"
+        ),
+        # Agent Cloud Sandbox Environment (optional)
+        "E2B_API_KEY": os.getenv("E2B_API_KEY"),
+        # Cloudflare tunnel token (optional)
+        "CLOUDFLARED_TUNNEL_TOKEN": os.getenv("CLOUDFLARED_TUNNEL_TOKEN"),
+        # Essential system environment variables
+        "HOME": os.getenv("HOME"),
+        "USER": os.getenv("USER"),
+        "PATH": os.getenv("PATH"),
+        "SHELL": os.getenv("SHELL"),
+        "TERM": os.getenv("TERM"),
+        "LANG": os.getenv("LANG"),
+        "LC_ALL": os.getenv("LC_ALL"),
+        # Python-specific variables that subprocesses might need
+        "PYTHONPATH": os.getenv("PYTHONPATH"),
+        "PYTHONUNBUFFERED": "1",  # Useful for subprocess output
+        # Working directory tracking
+        "PWD": os.getcwd(),
+    }
+
+    # Add GH_TOKEN as alias for GITHUB_PAT if it exists
+    github_pat = os.getenv("GITHUB_PAT")
+    if github_pat:
+        safe_env_vars["GH_TOKEN"] = github_pat
+
+    # Filter out None values
+    return {k: v for k, v in safe_env_vars.items() if v is not None}
+</file>
+
+<file path="adws/adw_triggers/adw_trigger_cron_todone.py">
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pydantic",
+#   "python-dotenv",
+#   "click",
+#   "rich",
+#   "schedule",
+# ]
+# ///
+"""
+Cron trigger for the multi-agent task list system.
+
+This script monitors the task list and automatically distributes tasks to agents.
+It runs continuously, checking for eligible tasks at a configurable interval.
+
+Usage:
+    # Method 1: Direct execution (requires uv)
+    ./adws/adw_triggers/adw_trigger_cron_todone.py
+
+    # Method 2: Using uv run
+    uv run adws/adw_triggers/adw_trigger_cron_todone.py
+
+    # With custom polling interval (seconds)
+    ./adws/adw_triggers/adw_trigger_cron_todone.py --interval 10
+
+    # Dry run mode (no changes made)
+    ./adws/adw_triggers/adw_trigger_cron_todone.py --dry-run
+
+Examples:
+    # Run with verbose output
+    ./adws/adw_triggers/adw_trigger_cron_todone.py --verbose
+
+    # Run with custom task file
+    ./adws/adw_triggers/adw_trigger_cron_todone.py --task-file ../tasks.md
+
+    # Run once and exit
+    ./adws/adw_triggers/adw_trigger_cron_todone.py --once
+"""
+
+import os
+import sys
+import json
+import time
+import subprocess
+import re
+from pathlib import Path
+from typing import List, Dict, Optional, Tuple
+from datetime import datetime
+import click
+import schedule
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.live import Live
+from rich.layout import Layout
+from rich.align import Align
+
+# Add the parent directory to the path so we can import modules
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, os.path.join(parent_dir, "adw_modules"))
+
+from agent import (
+    AgentTemplateRequest,
+    execute_template,
+    generate_short_id,
+)
+
+# Import our data models
+from data_models import (
+    Task,
+    Worktree,
+    WorktreeTaskGroup,
+    ProcessTasksResponse,
+    CronTriggerConfig,
+    SystemTag,
+)
+
+# Import utility functions
+from utils import parse_json
+
+# Configuration constants
+TARGET_DIRECTORY = "multi_agent_todone"
+
+
+class TaskListManager:
+    """Manages reading and updating the task list file."""
+
+    def __init__(self, file_path: str):
+        self.file_path = Path(file_path)
+        self.console = Console()
+
+    def read_task_list(self) -> str:
+        """Read the current task list file."""
+        if not self.file_path.exists():
+            raise FileNotFoundError(f"Task file not found: {self.file_path}")
+        return self.file_path.read_text()
+
+    def update_task_to_in_progress(
+        self, worktree_name: str, task_desc: str, adw_id: str
+    ) -> bool:
+        """Update a task from [] or [⏰] to [🟡, adw_id] status using the /mark_in_progress command."""
+        try:
+            request = AgentTemplateRequest(
+                agent_name="task-marker",
+                slash_command="/mark_in_progress",
+                args=[
+                    str(self.file_path),  # task_file_path
+                    worktree_name,
+                    task_desc,
+                    adw_id,
+                ],
+                adw_id=generate_short_id(),
+                model="x-ai/grok-4-fast",
+                working_dir=os.getcwd(),  # Run from project root
+            )
+
+            response = execute_template(request)
+            if response.success:
+                return True
+            else:
+                error_panel = Panel(
+                    f"Failed to mark task as in-progress: {task_desc}",
+                    title="[bold red]❌ Update Failed[/bold red]",
+                    border_style="red",
+                )
+                self.console.print(error_panel)
+                return False
+        except Exception as e:
+            error_panel = Panel(
+                f"Error marking task as in-progress: {str(e)}",
+                title="[bold red]❌ Update Error[/bold red]",
+                border_style="red",
+            )
+            self.console.print(error_panel)
+            return False
+
+    def write_task_list(self, content: str):
+        """Write updated content back to the task list file."""
+        self.file_path.write_text(content)
+
+
+class CronTrigger:
+    """Main cron trigger implementation."""
+
+    def __init__(self, config: CronTriggerConfig):
+        self.config = config
+        self.console = Console()
+        self.task_manager = TaskListManager(config.task_file_path)
+        self.running = True
+        self.stats = {
+            "checks": 0,
+            "tasks_started": 0,
+            "worktrees_created": 0,
+            "errors": 0,
+            "last_check": None,
+        }
+
+    def check_worktree_exists(self, worktree_name: str) -> bool:
+        """Check if a worktree already exists."""
+        worktree_path = Path(self.config.worktree_base_path) / worktree_name
+        return worktree_path.exists()
+
+    def create_worktree(self, worktree_name: str) -> bool:
+        """Create a new worktree using the init_worktree command."""
+        if self.config.dry_run:
+            self.console.print(
+                f"[yellow]DRY RUN: Would create worktree '{worktree_name}'[/yellow]"
+            )
+            return True
+
+        try:
+            request = AgentTemplateRequest(
+                agent_name="worktree-creator",
+                slash_command="/init_worktree",
+                args=[worktree_name, TARGET_DIRECTORY],
+                adw_id=generate_short_id(),
+                model="x-ai/grok-4-fast",
+                working_dir=os.getcwd(),
+            )
+
+            response = execute_template(request)
+            if response.success:
+                self.stats["worktrees_created"] += 1
+                success_panel = Panel(
+                    f"✓ Created worktree: {worktree_name}",
+                    title="[bold green]Worktree Created[/bold green]",
+                    border_style="green",
+                )
+                self.console.print(success_panel)
+                return True
+            else:
+                error_panel = Panel(
+                    f"Failed to create worktree: {worktree_name}",
+                    title="[bold red]❌ Worktree Creation Failed[/bold red]",
+                    border_style="red",
+                )
+                self.console.print(error_panel)
+                self.stats["errors"] += 1
+                return False
+        except Exception as e:
+            error_panel = Panel(
+                f"Error creating worktree: {str(e)}",
+                title="[bold red]❌ Worktree Creation Error[/bold red]",
+                border_style="red",
+            )
+            self.console.print(error_panel)
+            self.stats["errors"] += 1
+            return False
+
+    def get_eligible_tasks(self) -> List[WorktreeTaskGroup]:
+        """Get eligible tasks by running the process_tasks command."""
+        # First, check if there are any pending tasks in the file
+        # to avoid unnecessary agent calls
+        try:
+            task_content = self.task_manager.read_task_list()
+
+            # Look for patterns that indicate pending tasks: [] or [⏰]
+            # Using regex to find these patterns
+            pending_pattern = r"\[\s*\]|\[⏰\]"
+            if not re.search(pending_pattern, task_content):
+                # No pending tasks found, return empty list without calling agent
+                return []
+        except FileNotFoundError:
+            # Task file doesn't exist, return empty list
+            return []
+        except Exception as e:
+            # Error reading file, log it but continue to try the agent
+            self.console.print(
+                f"[yellow]Warning: Could not pre-check task file: {str(e)}[/yellow]"
+            )
+
+        # If we found pending tasks (or couldn't check), proceed with agent call
+        try:
+            request = AgentTemplateRequest(
+                agent_name="task-processor",
+                slash_command="/process_tasks",
+                args=[],
+                adw_id=generate_short_id(),
+                model="x-ai/grok-4-fast",
+                working_dir=os.getcwd(),
+            )
+
+            response = execute_template(request)
+            if response.success:
+                # Parse the JSON response using the utility function
+                try:
+                    # Use parse_json utility which handles markdown code blocks
+                    task_data = parse_json(response.output, list)
+
+                    if task_data:
+                        # Convert to our data model
+                        return [WorktreeTaskGroup(**group) for group in task_data]
+                    else:
+                        return []
+                except (ValueError, json.JSONDecodeError) as e:
+                    error_panel = Panel(
+                        f"Failed to parse task response: {e}",
+                        title="[bold red]❌ Parse Error[/bold red]",
+                        border_style="red",
+                    )
+                    self.console.print(error_panel)
+                    self.stats["errors"] += 1
+                    return []
+            else:
+                error_panel = Panel(
+                    "Failed to get eligible tasks",
+                    title="[bold red]❌ Task Retrieval Failed[/bold red]",
+                    border_style="red",
+                )
+                self.console.print(error_panel)
+                self.stats["errors"] += 1
+                return []
+        except Exception as e:
+            error_panel = Panel(
+                f"Error getting eligible tasks: {str(e)}",
+                title="[bold red]❌ Task Retrieval Error[/bold red]",
+                border_style="red",
+            )
+            self.console.print(error_panel)
+            self.stats["errors"] += 1
+            return []
+
+    def delegate_task(
+        self, worktree_name: str, task_desc: str, adw_id: str, tags: List[str] = None
+    ):
+        """Delegate a task to the appropriate workflow based on tags.
+
+        By default, uses the lightweight build-update workflow.
+        If 'adw_plan_implement_update_task' tag is present, uses the full plan-implement-update workflow.
+        Model selection: 'grok-4' tag uses x-ai/grok-4 model, 'grok-4-fast' tag uses x-ai/grok-4-fast model, default is grok-4-fast.
+        """
+        # Extract workflow and model from tags
+        tags = tags or []
+        use_full_workflow = SystemTag.extract_workflow_from_tags(tags)
+        model = SystemTag.extract_model_from_tags(tags) or "x-ai/grok-4-fast"  # Default to x-ai/grok-4-fast
+
+        if self.config.dry_run:
+            workflow_type = (
+                "plan-implement-update" if use_full_workflow else "build-update"
+            )
+            self.console.print(
+                f"[yellow]DRY RUN: Would delegate task '{task_desc}' with ADW ID {adw_id} using {workflow_type} workflow with {model} model[/yellow]"
+            )
+            return
+
+        try:
+            # Determine which workflow script to use
+            if use_full_workflow:
+                # Use the full plan-implement-update workflow
+                workflow_script = "adw_plan_implement_update_task.py"
+                workflow_type = "plan-implement-update"
+                slash_command = "/plan + /implement + /update_task"
+            else:
+                # Use the lightweight build-update workflow (default)
+                workflow_script = "adw_build_update_task.py"
+                workflow_type = "build-update"
+                slash_command = "/build + /update_task"
+
+            # Build the command to run the workflow
+            cmd = [
+                sys.executable,
+                os.path.join(parent_dir, workflow_script),
+                "--adw-id",
+                adw_id,
+                "--worktree-name",
+                worktree_name,
+                "--task",
+                task_desc,
+                "--model",
+                model,
+            ]
+
+            # Create a panel showing the agent execution details
+            exec_details = f"[bold]Slash Command:[/bold] {slash_command}\n"
+            exec_details += f"[bold]Arguments:[/bold]\n"
+            exec_details += f"  • ADW ID: {adw_id}\n"
+            exec_details += f"  • Worktree: {worktree_name}\n"
+            exec_details += f"  • Task: {task_desc}\n"
+            exec_details += f"  • Model: {model}\n"
+            exec_details += f"  • Workflow: {workflow_type}"
+
+            exec_panel = Panel(
+                exec_details,
+                title="[bold cyan]🤖 Executing Agent[/bold cyan]",
+                border_style="cyan",
+                padding=(1, 2),
+            )
+            self.console.print(exec_panel)
+
+            # Run the workflow in a subprocess
+            result = subprocess.Popen(cmd)
+
+            self.stats["tasks_started"] += 1
+
+            # Create success panel for task delegation
+            delegation_panel = Panel(
+                f"✓ Task delegated with ADW ID: {adw_id}",
+                title="[bold green]✅ Task Delegated[/bold green]",
+                border_style="green",
+            )
+            self.console.print(delegation_panel)
+
+        except Exception as e:
+            error_panel = Panel(
+                f"Error delegating task: {str(e)}",
+                title="[bold red]❌ Delegation Failed[/bold red]",
+                border_style="red",
+            )
+            self.console.print(error_panel)
+            self.stats["errors"] += 1
+
+    def process_tasks(self):
+        """Main task processing logic."""
+        self.stats["checks"] += 1
+        self.stats["last_check"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Get eligible tasks
+        task_groups = self.get_eligible_tasks()
+
+        if not task_groups:
+            # Print newline to ensure we're on a fresh line (clears any status spinners)
+            self.console.print()
+            info_panel = Panel(
+                "No eligible tasks found. Update tasks.md to orchestrate your agents.",
+                title="[bold yellow]No Tasks[/bold yellow]",
+                border_style="yellow",
+            )
+            self.console.print(info_panel)
+            return
+
+        # No longer need to read task list here since each task update is handled by the prompt
+        # Check if task file exists
+        try:
+            _ = self.task_manager.read_task_list()  # Just verify it exists
+        except FileNotFoundError:
+            error_panel = Panel(
+                f"Task file not found: {self.config.task_file_path}",
+                title="[bold red]❌ File Not Found[/bold red]",
+                border_style="red",
+            )
+            self.console.print(error_panel)
+            self.stats["errors"] += 1
+            return
+
+        # Report tasks that will be kicked off
+        task_summary_lines = []
+        total_tasks = 0
+        for group in task_groups:
+            if group.tasks_to_start:
+                task_summary_lines.append(
+                    f"[bold cyan]Worktree: {group.worktree_name}[/bold cyan]"
+                )
+                for task in group.tasks_to_start:
+                    tags_str = (
+                        f" [dim]({', '.join(task.tags)})[/dim]" if task.tags else ""
+                    )
+                    task_summary_lines.append(f"  • {task.description}{tags_str}")
+                    total_tasks += 1
+                task_summary_lines.append("")  # Empty line between worktrees
+
+        if task_summary_lines:
+            # Remove last empty line
+            if task_summary_lines[-1] == "":
+                task_summary_lines.pop()
+
+            tasks_panel = Panel(
+                "\n".join(task_summary_lines),
+                title=f"[bold green]🚀 Starting {total_tasks} Task{'s' if total_tasks != 1 else ''}[/bold green]",
+                border_style="green",
+            )
+            self.console.print(tasks_panel)
+
+        # Process each worktree group
+        for group in task_groups:
+            # Check if worktree exists, create if needed
+            if not self.check_worktree_exists(group.worktree_name):
+                info_panel = Panel(
+                    f"Worktree '{group.worktree_name}' doesn't exist, creating...",
+                    title="[bold yellow]ℹ️ Creating Worktree[/bold yellow]",
+                    border_style="yellow",
+                )
+                self.console.print(info_panel)
+                if not self.create_worktree(group.worktree_name):
+                    continue  # Skip this group if worktree creation failed
+
+            # Process tasks in this worktree
+            for task in group.tasks_to_start:
+                # Generate ADW ID for this task
+                adw_id = generate_short_id()
+
+                # Update task status to in-progress
+                try:
+                    if not self.config.dry_run:
+                        success = self.task_manager.update_task_to_in_progress(
+                            group.worktree_name, task.description, adw_id
+                        )
+                        if not success:
+                            error_panel = Panel(
+                                f"Failed to update task to in-progress: {task.description}",
+                                title="[bold red]❌ Update Failed[/bold red]",
+                                border_style="red",
+                            )
+                            self.console.print(error_panel)
+                            self.stats["errors"] += 1
+                            continue
+
+                        # Create success panel for task update
+                        update_panel = Panel(
+                            f"✓ Updated task to in-progress: {task.description}",
+                            title="[bold green]✅ Task Status Updated[/bold green]",
+                            border_style="green",
+                        )
+                        self.console.print(update_panel)
+                    else:
+                        self.console.print(
+                            f"[yellow]DRY RUN: Would update task '{task.description}' to [🟡, {adw_id}][/yellow]"
+                        )
+
+                    # Delegate task to workflow
+                    self.delegate_task(
+                        group.worktree_name, task.description, adw_id, task.tags
+                    )
+
+                except Exception as e:
+                    error_panel = Panel(
+                        f"Error processing task: {str(e)}",
+                        title="[bold red]❌ Task Processing Error[/bold red]",
+                        border_style="red",
+                    )
+                    self.console.print(error_panel)
+                    self.stats["errors"] += 1
+                    continue
+
+                # Respect max concurrent tasks
+                if self.stats["tasks_started"] >= self.config.max_concurrent_tasks:
+                    warning_panel = Panel(
+                        f"Reached max concurrent tasks ({self.config.max_concurrent_tasks})",
+                        title="[bold yellow]⚠️ Task Limit[/bold yellow]",
+                        border_style="yellow",
+                    )
+                    self.console.print(warning_panel)
+                    return
+
+    def create_status_display(self) -> Panel:
+        """Create a status display panel."""
+        table = Table(show_header=False, box=None)
+        table.add_column(style="bold cyan")
+        table.add_column()
+
+        table.add_row(
+            "Status", "[green]Running[/green]" if self.running else "[red]Stopped[/red]"
+        )
+        table.add_row("Polling Interval", f"{self.config.polling_interval} seconds")
+        table.add_row("Task File", str(self.config.task_file_path))
+        table.add_row("Dry Run", "Yes" if self.config.dry_run else "No")
+        table.add_row("", "")
+        table.add_row("Checks", str(self.stats["checks"]))
+        table.add_row("Tasks Started", str(self.stats["tasks_started"]))
+        table.add_row("Worktrees Created", str(self.stats["worktrees_created"]))
+        table.add_row("Errors", str(self.stats["errors"]))
+        table.add_row("Last Check", self.stats["last_check"] or "Never")
+
+        return Panel(
+            Align.center(table),
+            title="[bold blue] Multi-Agent Task Cron[/bold blue]",
+            border_style="blue",
+        )
+
+    def run_once(self):
+        """Run the task check once and exit."""
+        self.console.print(self.create_status_display())
+        self.console.print("\n[yellow]Running single check...[/yellow]\n")
+        self.process_tasks()
+        self.console.print("\n[green]✅ Single check completed[/green]")
+
+    def run_continuous(self):
+        """Run continuously with scheduled checks."""
+        # Schedule the task processing
+        schedule.every(self.config.polling_interval).seconds.do(self.process_tasks)
+
+        self.console.print(self.create_status_display())
+        self.console.print(
+            f"\n[green]Started monitoring tasks every {self.config.polling_interval} seconds[/green]"
+        )
+        self.console.print("[dim]Press Ctrl+C to stop[/dim]\n")
+
+        try:
+            while self.running:
+                schedule.run_pending()
+                time.sleep(1)
+        except KeyboardInterrupt:
+            self.running = False
+            self.console.print("\n[yellow]Stopping cron trigger...[/yellow]")
+            self.console.print(self.create_status_display())
+            self.console.print("[green]✅ Cron trigger stopped[/green]")
+
+
+@click.command()
+@click.option(
+    "--interval", type=int, default=5, help="Polling interval in seconds (default: 5)"
+)
+@click.option(
+    "--task-file",
+    type=click.Path(exists=False),
+    default="tasks.md",
+    help="Path to task list file (default: tasks.md)",
+)
+@click.option(
+    "--dry-run", is_flag=True, help="Run in dry-run mode without making changes"
+)
+@click.option(
+    "--max-tasks", type=int, default=5, help="Maximum concurrent tasks (default: 5)"
+)
+@click.option(
+    "--once", is_flag=True, help="Run once and exit instead of continuous monitoring"
+)
+@click.option("--verbose", is_flag=True, help="Enable verbose output")
+def main(
+    interval: int,
+    task_file: str,
+    dry_run: bool,
+    max_tasks: int,
+    once: bool,
+    verbose: bool,
+):
+    """Monitor and distribute tasks from the multi-agent task list."""
+    console = Console()
+
+    # Create configuration
+    config = CronTriggerConfig(
+        polling_interval=interval,
+        task_file_path=task_file,
+        dry_run=dry_run,
+        max_concurrent_tasks=max_tasks,
+    )
+
+    # Create and run the trigger
+    trigger = CronTrigger(config)
+
+    if once:
+        trigger.run_once()
+    else:
+        trigger.run_continuous()
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="adws/adw_build_update_task.py">
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pydantic",
+#   "python-dotenv",
+#   "click",
+#   "rich",
+# ]
+# ///
+"""
+Run build and update task workflow for lightweight multi-agent task processing.
+
+This script runs two slash commands in sequence:
+1. /build - Directly implements the task without planning
+2. /update_task - Updates the task list with the result
+
+This is a simplified version of adw_plan_implement_update_task.py that skips
+the planning phase for simpler tasks.
+
+Usage:
+    # Method 1: Direct execution (requires uv)
+    ./adws/adw_build_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Fix typo in README"
+
+    # Method 2: Using uv run
+    uv run adws/adw_build_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Add logging statement"
+
+Examples:
+    # Run with specific model
+    ./adws/adw_build_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Update version" --model x-ai/grok-4
+
+    # Run with verbose output
+    ./adws/adw_build_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Fix import" --verbose
+"""
+
+import os
+import sys
+import json
+import subprocess
+from pathlib import Path
+from typing import Optional
+from datetime import datetime
+import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.rule import Rule
+
+# Add the adw_modules directory to the path so we can import agent
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "adw_modules"))
+
+from agent import (
+    AgentTemplateRequest,
+    AgentPromptResponse,
+    execute_template,
+)
+from utils import format_agent_status, format_worktree_status
+
+def print_status_panel(console, action: str, adw_id: str, worktree: str, phase: str = None, status: str = "info"):
+    """Print a status panel with timestamp and context.
+    
+    Args:
+        console: Rich console instance
+        action: The action being performed
+        adw_id: ADW ID for tracking
+        worktree: Worktree/branch name
+        phase: Optional phase name (build, plan, etc)
+        status: Status type (info, success, error)
+    """
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # Choose color based on status
+    if status == "success":
+        border_style = "green"
+        icon = "✅"
+    elif status == "error":
+        border_style = "red"
+        icon = "❌"
+    else:
+        border_style = "cyan"
+        icon = "🔄"
+    
+    # Build title with context
+    title_parts = [f"[{timestamp}]", adw_id[:6], worktree]
+    if phase:
+        title_parts.append(phase)
+    title = " | ".join(title_parts)
+    
+    console.print(
+        Panel(
+            f"{icon} {action}",
+            title=f"[bold {border_style}]{title}[/bold {border_style}]",
+            border_style=border_style,
+            padding=(0, 1),
+        )
+    )
+
+# Output file name constants
+OUTPUT_JSONL = "cc_raw_output.jsonl"
+OUTPUT_JSON = "cc_raw_output.json"
+FINAL_OBJECT_JSON = "cc_final_object.json"
+SUMMARY_JSON = "custom_summary_output.json"
+
+
+def get_current_commit_hash(working_dir: str) -> Optional[str]:
+    """Get the current git commit hash in the working directory."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=working_dir,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()[:9]  # Return first 9 characters of hash
+    except subprocess.CalledProcessError:
+        return None
+
+
+@click.command()
+@click.option(
+    "--adw-id",
+    required=True,
+    help="ADW ID for this task execution"
+)
+@click.option(
+    "--worktree-name",
+    required=True,
+    help="Name of the git worktree to work in"
+)
+@click.option(
+    "--task",
+    required=True,
+    help="Task description to implement"
+)
+@click.option(
+    "--model",
+    type=click.Choice(["x-ai/grok-4-fast", "x-ai/grok-4"]),
+    default="x-ai/grok-4-fast",
+    help="OpenRouter model to use",
+)
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose output"
+)
+def main(
+    adw_id: str,
+    worktree_name: str,
+    task: str,
+    model: str,
+    verbose: bool,
+):
+    """Run build and update task workflow for lightweight multi-agent processing."""
+    console = Console()
+
+    # Calculate the worktree path and the actual working directory
+    # With sparse checkout, the structure is: trees/{worktree_name}/{target_directory}/
+    worktree_base_path = os.path.abspath(f"trees/{worktree_name}")
+    target_directory = "multi_agent_todone"
+    worktree_path = os.path.join(worktree_base_path, target_directory)
+    
+    # Check if worktree exists, create if needed
+    if not os.path.exists(worktree_base_path):
+        console.print(Panel(
+            f"[bold yellow]Worktree not found at: {worktree_base_path}[/bold yellow]\n\n"
+            "Creating worktree now...",
+            title="[bold yellow]⚠️  Worktree Missing[/bold yellow]",
+            border_style="yellow",
+        ))
+        
+        # Create worktree using the init_worktree command
+        init_request = AgentTemplateRequest(
+            agent_name="worktree-initializer",
+            slash_command="/init_worktree",
+            args=[worktree_name, target_directory],
+            adw_id=adw_id,
+            model=model,
+            working_dir=os.getcwd(),  # Run from project root
+        )
+        
+        # Print start message for worktree creation
+        print_status_panel(console, "Starting worktree creation", adw_id, worktree_name, "init")
+        
+        init_response = execute_template(init_request)
+        
+        # Print completion message
+        print_status_panel(console, "Completed worktree creation", adw_id, worktree_name, "init", "success")
+        
+        if init_response.success:
+            console.print(Panel(
+                f"[bold green]✅ Worktree created successfully at: {worktree_base_path}[/bold green]",
+                title="[bold green]Worktree Created[/bold green]",
+                border_style="green",
+            ))
+        else:
+            console.print(Panel(
+                f"[bold red]Failed to create worktree:\n{init_response.output}[/bold red]",
+                title="[bold red]❌ Worktree Creation Failed[/bold red]",
+                border_style="red",
+            ))
+            sys.exit(1)
+
+    # Set agent names for each phase
+    builder_name = f"builder-{worktree_name}"
+    updater_name = f"updater-{worktree_name}"
+
+    console.print(
+        Panel(
+            f"[bold blue]ADW Build-Update Workflow (Lightweight)[/bold blue]\n\n"
+            f"[cyan]ADW ID:[/cyan] {adw_id}\n"
+            f"[cyan]Worktree:[/cyan] {worktree_name}\n"
+            f"[cyan]Task:[/cyan] {task}\n"
+            f"[cyan]Model:[/cyan] {model}\n"
+            f"[cyan]Working Dir:[/cyan] {worktree_path}",
+            title="[bold blue]🚀 Workflow Configuration[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    # Track workflow state
+    workflow_success = True
+    commit_hash = None
+    error_message = None
+
+    # Phase 1: Run /build command
+    console.print(Rule("[bold yellow]Phase 1: Build (/build)[/bold yellow]"))
+    console.print()
+
+    build_request = AgentTemplateRequest(
+        agent_name=builder_name,
+        slash_command="/build",
+        args=[adw_id, task],
+        adw_id=adw_id,
+        model=model,
+        working_dir=worktree_path,
+    )
+
+    # Display build execution info
+    build_info_table = Table(show_header=False, box=None, padding=(0, 1))
+    build_info_table.add_column(style="bold cyan")
+    build_info_table.add_column()
+
+    build_info_table.add_row("ADW ID", adw_id)
+    build_info_table.add_row("Phase", "Build")
+    build_info_table.add_row("Command", "/build")
+    build_info_table.add_row("Args", f'{adw_id} "{task}"')
+    build_info_table.add_row("Model", model)
+    build_info_table.add_row("Agent", builder_name)
+
+    console.print(
+        Panel(
+            build_info_table,
+            title=f"[bold blue]🚀 Build Inputs | {adw_id} | {worktree_name}[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    try:
+        # Print start message for build phase
+        print_status_panel(console, "Starting build process", adw_id, worktree_name, "build")
+        
+        # Execute the build command
+        build_response = execute_template(build_request)
+        
+        # Print completion message  
+        print_status_panel(console, "Completed build process", adw_id, worktree_name, "build", "success")
+
+        if build_response.success:
+            console.print(
+                Panel(
+                    build_response.output if verbose else "Build completed successfully",
+                    title=f"[bold green]✅ Build Success | {adw_id} | {worktree_name}[/bold green]",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
+
+            # Get the commit hash after successful build
+            commit_hash = get_current_commit_hash(worktree_path)
+            if commit_hash:
+                console.print(f"\n[bold cyan]Commit hash:[/bold cyan] {commit_hash}")
+        else:
+            workflow_success = False
+            error_message = "Build phase failed"
+            console.print(
+                Panel(
+                    build_response.output,
+                    title=f"[bold red]❌ Build Failed | {adw_id} | {worktree_name}[/bold red]",
+                    border_style="red",
+                    padding=(1, 2),
+                )
+            )
+
+        # Save build phase summary
+        build_output_dir = f"./agents/{adw_id}/{builder_name}"
+        build_summary_path = f"{build_output_dir}/{SUMMARY_JSON}"
+
+        with open(build_summary_path, "w") as f:
+            json.dump(
+                {
+                    "phase": "build",
+                    "adw_id": adw_id,
+                    "worktree_name": worktree_name,
+                    "task": task,
+                    "slash_command": "/build",
+                    "args": [adw_id, task],
+                    "model": model,
+                    "working_dir": worktree_path,
+                    "success": build_response.success,
+                    "session_id": build_response.session_id,
+                    "commit_hash": commit_hash,
+                },
+                f,
+                indent=2,
+            )
+
+        # Phase 2: Run /update_task command (always run to update status)
+        console.print()
+        console.print(Rule("[bold yellow]Phase 2: Update Task (/update_task)[/bold yellow]"))
+        console.print()
+
+        # Determine the status to update
+        update_status = "success" if workflow_success and commit_hash else "failed"
+
+        update_request = AgentTemplateRequest(
+            agent_name=updater_name,
+            slash_command="/update_task",
+            args=[
+                adw_id,
+                worktree_name,
+                task,
+                update_status,
+                commit_hash or "",
+                error_message or ""
+            ],
+            adw_id=adw_id,
+            model=model,
+            working_dir=os.getcwd(),  # Run from project root to update main tasks.md
+        )
+
+        # Display update execution info
+        update_info_table = Table(show_header=False, box=None, padding=(0, 1))
+        update_info_table.add_column(style="bold cyan")
+        update_info_table.add_column()
+
+        update_info_table.add_row("ADW ID", adw_id)
+        update_info_table.add_row("Phase", "Update Task")
+        update_info_table.add_row("Command", "/update_task")
+        update_info_table.add_row("Status", update_status)
+        update_info_table.add_row("Model", model)
+        update_info_table.add_row("Agent", updater_name)
+
+        console.print(
+            Panel(
+                update_info_table,
+                title=f"[bold blue]🚀 Update Inputs | {adw_id} | {worktree_name}[/bold blue]",
+                border_style="blue",
+            )
+        )
+        console.print()
+
+        # Print start message for update phase
+        print_status_panel(console, "Starting task status update", adw_id, worktree_name, "update")
+        
+        # Execute the update command
+        update_response = execute_template(update_request)
+        
+        # Print completion message
+        print_status_panel(console, "Completed task status update", adw_id, worktree_name, "update", "success")
+
+        if update_response.success:
+            console.print(
+                Panel(
+                    update_response.output if verbose else "Task status updated successfully",
+                    title=f"[bold green]✅ Update Success | {adw_id} | {worktree_name}[/bold green]",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
+        else:
+            console.print(
+                Panel(
+                    update_response.output,
+                    title=f"[bold red]❌ Update Failed | {adw_id} | {worktree_name}[/bold red]",
+                    border_style="red",
+                    padding=(1, 2),
+                )
+            )
+
+        # Save update phase summary
+        update_output_dir = f"./agents/{adw_id}/{updater_name}"
+        update_summary_path = f"{update_output_dir}/{SUMMARY_JSON}"
+
+        with open(update_summary_path, "w") as f:
+            json.dump(
+                {
+                    "phase": "update_task",
+                    "adw_id": adw_id,
+                    "worktree_name": worktree_name,
+                    "task": task,
+                    "slash_command": "/update_task",
+                    "args": [adw_id, worktree_name, task, update_status, commit_hash or "", error_message or ""],
+                    "model": model,
+                    "working_dir": os.getcwd(),  # update_task runs from project root
+                    "success": update_response.success,
+                    "session_id": update_response.session_id,
+                    "final_status": update_status,
+                },
+                f,
+                indent=2,
+            )
+
+        # Show workflow summary
+        console.print()
+        console.print(Rule("[bold blue]Workflow Summary[/bold blue]"))
+        console.print()
+
+        summary_table = Table(show_header=True, box=None)
+        summary_table.add_column("Phase", style="bold cyan")
+        summary_table.add_column("Status", style="bold")
+        summary_table.add_column("Output Directory", style="dim")
+
+        # Build phase row
+        build_status_display = "✅ Success" if build_response.success else "❌ Failed"
+        summary_table.add_row(
+            "Build (/build)",
+            build_status_display,
+            f"./agents/{adw_id}/{builder_name}/",
+        )
+
+        # Update phase row
+        update_status_display = "✅ Success" if update_response.success else "❌ Failed"
+        summary_table.add_row(
+            "Update Task (/update_task)",
+            update_status_display,
+            f"./agents/{adw_id}/{updater_name}/",
+        )
+
+        console.print(summary_table)
+
+        # Create overall workflow summary
+        workflow_summary_path = f"./agents/{adw_id}/workflow_summary.json"
+        os.makedirs(f"./agents/{adw_id}", exist_ok=True)
+
+        with open(workflow_summary_path, "w") as f:
+            json.dump(
+                {
+                    "workflow": "build_update_task",
+                    "adw_id": adw_id,
+                    "worktree_name": worktree_name,
+                    "task": task,
+                    "model": model,
+                    "working_dir": worktree_path,
+                    "commit_hash": commit_hash,
+                    "phases": {
+                        "build": {
+                            "success": build_response.success,
+                            "session_id": build_response.session_id,
+                            "agent": builder_name,
+                        },
+                        "update_task": {
+                            "success": update_response.success,
+                            "session_id": update_response.session_id,
+                            "agent": updater_name,
+                        },
+                    },
+                    "overall_success": workflow_success,
+                    "final_task_status": "success" if workflow_success and commit_hash else "failed",
+                },
+                f,
+                indent=2,
+            )
+
+        console.print(
+            f"\n[bold cyan]Workflow summary:[/bold cyan] {workflow_summary_path}"
+        )
+        console.print()
+
+        # Exit with appropriate code
+        if workflow_success:
+            console.print(
+                "[bold green]✅ Workflow completed successfully![/bold green]"
+            )
+            sys.exit(0)
+        else:
+            console.print(
+                "[bold yellow]⚠️  Workflow completed with errors[/bold yellow]"
+            )
+            sys.exit(1)
+
+    except Exception as e:
+        console.print(
+            Panel(
+                f"[bold red]{str(e)}[/bold red]",
+                title="[bold red]❌ Unexpected Error[/bold red]",
+                border_style="red",
+            )
+        )
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="adws/adw_chore_implement.py">
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pydantic",
+#   "python-dotenv",
+#   "click",
+#   "rich",
+# ]
+# ///
+"""
+Run chore planning and implementation workflow.
+
+This script runs two slash commands in sequence:
+1. /chore - Creates a plan based on the prompt
+2. /implement - Implements the plan created by /chore
+
+Usage:
+    # Method 1: Direct execution (requires uv)
+    ./adws/adw_chore_implement.py "Add error handling to all API endpoints"
+
+    # Method 2: Using uv run
+    uv run adws/adw_chore_implement.py "Refactor database connection logic"
+
+Examples:
+    # Run with specific model
+    ./adws/adw_chore_implement.py "Add logging to agent.py" --model x-ai/grok-4
+
+    # Run from a different working directory
+    ./adws/adw_chore_implement.py "Update documentation" --working-dir /path/to/project
+
+    # Run with verbose output
+    ./adws/adw_chore_implement.py "Add tests" --verbose
+"""
+
+import os
+import sys
+import json
+import re
+from pathlib import Path
+import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.rule import Rule
+
+# Add the adw_modules directory to the path so we can import agent
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "adw_modules"))
+
+from agent import (
+    AgentTemplateRequest,
+    AgentPromptResponse,
+    execute_template,
+    generate_short_id,
+)
+
+# Output file name constants
+OUTPUT_JSONL = "cc_raw_output.jsonl"
+OUTPUT_JSON = "cc_raw_output.json"
+FINAL_OBJECT_JSON = "cc_final_object.json"
+SUMMARY_JSON = "custom_summary_output.json"
+
+
+def extract_plan_path(output: str) -> str:
+    """Extract the plan file path from the chore command output.
+
+    Looks for patterns like:
+    - specs/chore-12345678-update-readme.md
+    - Created plan at: specs/chore-...
+    - Plan file: specs/chore-...
+    """
+    # Try multiple patterns to find the plan path
+    patterns = [
+        r"specs/chore-[a-zA-Z0-9\-]+\.md",
+        r"Created plan at:\s*(specs/chore-[a-zA-Z0-9\-]+\.md)",
+        r"Plan file:\s*(specs/chore-[a-zA-Z0-9\-]+\.md)",
+        r"path.*?:\s*(specs/chore-[a-zA-Z0-9\-]+\.md)",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, output, re.IGNORECASE | re.MULTILINE)
+        if match:
+            return match.group(1) if match.groups() else match.group(0)
+
+    # If no match found, raise an error
+    raise ValueError("Could not find plan file path in chore output")
+
+
+@click.command()
+@click.argument("prompt", required=True)
+@click.option(
+    "--model",
+    type=click.Choice(["x-ai/grok-4-fast", "x-ai/grok-4"]),
+    default="x-ai/grok-4-fast",
+    help="OpenRouter model to use",
+)
+@click.option(
+    "--working-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True),
+    help="Working directory for command execution (default: current directory)",
+)
+def main(
+    prompt: str,
+    model: str,
+    working_dir: str,
+):
+    """Run chore planning and implementation workflow."""
+    console = Console()
+
+    # Generate a unique ID for this workflow
+    adw_id = generate_short_id()
+
+    # Use current directory if no working directory specified
+    if not working_dir:
+        working_dir = os.getcwd()
+
+    # Set default agent names
+    planner_name = "planner"
+    builder_name = "builder"
+
+    console.print(
+        Panel(
+            f"[bold blue]ADW Chore & Implement Workflow[/bold blue]\n\n"
+            f"[cyan]ADW ID:[/cyan] {adw_id}\n"
+            f"[cyan]Model:[/cyan] {model}\n"
+            f"[cyan]Working Dir:[/cyan] {working_dir}",
+            title="[bold blue]🚀 Workflow Configuration[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    # Phase 1: Run /chore command
+    console.print(Rule("[bold yellow]Phase 1: Planning (/chore)[/bold yellow]"))
+    console.print()
+
+    # Create the chore request
+    chore_request = AgentTemplateRequest(
+        agent_name=planner_name,
+        slash_command="/chore",
+        args=[adw_id, prompt],
+        adw_id=adw_id,
+        model=model,
+        working_dir=working_dir,
+    )
+
+    # Display chore execution info
+    chore_info_table = Table(show_header=False, box=None, padding=(0, 1))
+    chore_info_table.add_column(style="bold cyan")
+    chore_info_table.add_column()
+
+    chore_info_table.add_row("ADW ID", adw_id)
+    chore_info_table.add_row("ADW Name", "adw_chore_implement (planning)")
+    chore_info_table.add_row("Command", "/chore")
+    chore_info_table.add_row("Args", f'{adw_id} "{prompt}"')
+    chore_info_table.add_row("Model", model)
+    chore_info_table.add_row("Agent", planner_name)
+
+    console.print(
+        Panel(
+            chore_info_table,
+            title="[bold blue]🚀 Chore Inputs[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    plan_path = None
+
+    try:
+        # Execute the chore command
+        with console.status("[bold yellow]Creating plan...[/bold yellow]"):
+            chore_response = execute_template(chore_request)
+
+        # Display the chore result
+        if chore_response.success:
+            # Success panel
+            console.print(
+                Panel(
+                    chore_response.output,
+                    title="[bold green]✅ Planning Success[/bold green]",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
+
+            # Extract the plan path from the output
+            try:
+                plan_path = extract_plan_path(chore_response.output)
+                console.print(f"\n[bold cyan]Plan created at:[/bold cyan] {plan_path}")
+            except ValueError as e:
+                console.print(
+                    Panel(
+                        f"[bold red]Could not extract plan path: {str(e)}[/bold red]\n\n"
+                        "The chore command succeeded but the plan file path could not be found in the output.",
+                        title="[bold red]❌ Parse Error[/bold red]",
+                        border_style="red",
+                    )
+                )
+                sys.exit(3)
+
+        else:
+            # Error panel
+            console.print(
+                Panel(
+                    chore_response.output,
+                    title="[bold red]❌ Planning Failed[/bold red]",
+                    border_style="red",
+                    padding=(1, 2),
+                )
+            )
+            console.print(
+                "\n[bold red]Workflow aborted: Planning phase failed[/bold red]"
+            )
+            sys.exit(1)
+
+        # Save chore phase summary
+        chore_output_dir = f"./agents/{adw_id}/{planner_name}"
+        chore_summary_path = f"{chore_output_dir}/{SUMMARY_JSON}"
+
+        with open(chore_summary_path, "w") as f:
+            json.dump(
+                {
+                    "phase": "planning",
+                    "adw_id": adw_id,
+                    "slash_command": "/chore",
+                    "args": [adw_id, prompt],
+                    "path_to_slash_command_prompt": ".claude/commands/chore.md",
+                    "model": model,
+                    "working_dir": working_dir,
+                    "success": chore_response.success,
+                    "session_id": chore_response.session_id,
+                    "retry_code": chore_response.retry_code,
+                    "output": chore_response.output,
+                    "plan_path": plan_path,
+                },
+                f,
+                indent=2,
+            )
+
+        # Show chore output files
+        console.print()
+
+        # Files saved panel for chore phase
+        chore_files_table = Table(show_header=True, box=None)
+        chore_files_table.add_column("File Type", style="bold cyan")
+        chore_files_table.add_column("Path", style="dim")
+        chore_files_table.add_column("Description", style="italic")
+
+        chore_files_table.add_row(
+            "JSONL Stream",
+            f"{chore_output_dir}/{OUTPUT_JSONL}",
+            "Raw streaming output from Claude Code",
+        )
+        chore_files_table.add_row(
+            "JSON Array",
+            f"{chore_output_dir}/{OUTPUT_JSON}",
+            "All messages as a JSON array",
+        )
+        chore_files_table.add_row(
+            "Final Object",
+            f"{chore_output_dir}/{FINAL_OBJECT_JSON}",
+            "Last message entry (final result)",
+        )
+        chore_files_table.add_row(
+            "Summary",
+            chore_summary_path,
+            "High-level execution summary with metadata",
+        )
+
+        console.print(
+            Panel(
+                chore_files_table,
+                title="[bold blue]📄 Planning Output Files[/bold blue]",
+                border_style="blue",
+            )
+        )
+
+        console.print()
+
+        # Phase 2: Run /implement command
+        console.print(
+            Rule("[bold yellow]Phase 2: Implementation (/implement)[/bold yellow]")
+        )
+        console.print()
+
+        # Create the implement request
+        implement_request = AgentTemplateRequest(
+            agent_name=builder_name,
+            slash_command="/implement",
+            args=[plan_path],
+            adw_id=adw_id,
+            model=model,
+            working_dir=working_dir,
+        )
+
+        # Display implement execution info
+        implement_info_table = Table(show_header=False, box=None, padding=(0, 1))
+        implement_info_table.add_column(style="bold cyan")
+        implement_info_table.add_column()
+
+        implement_info_table.add_row("ADW ID", adw_id)
+        implement_info_table.add_row("ADW Name", "adw_chore_implement (building)")
+        implement_info_table.add_row("Command", "/implement")
+        implement_info_table.add_row("Args", plan_path)
+        implement_info_table.add_row("Model", model)
+        implement_info_table.add_row("Agent", builder_name)
+
+        console.print(
+            Panel(
+                implement_info_table,
+                title="[bold blue]🚀 Implement Inputs[/bold blue]",
+                border_style="blue",
+            )
+        )
+        console.print()
+
+        # Execute the implement command
+        with console.status("[bold yellow]Implementing plan...[/bold yellow]"):
+            implement_response = execute_template(implement_request)
+
+        # Display the implement result
+        if implement_response.success:
+            # Success panel
+            console.print(
+                Panel(
+                    implement_response.output,
+                    title="[bold green]✅ Implementation Success[/bold green]",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
+
+            if implement_response.session_id:
+                console.print(
+                    f"\n[bold cyan]Session ID:[/bold cyan] {implement_response.session_id}"
+                )
+        else:
+            # Error panel
+            console.print(
+                Panel(
+                    implement_response.output,
+                    title="[bold red]❌ Implementation Failed[/bold red]",
+                    border_style="red",
+                    padding=(1, 2),
+                )
+            )
+
+        # Save implement phase summary
+        implement_output_dir = f"./agents/{adw_id}/{builder_name}"
+        implement_summary_path = f"{implement_output_dir}/{SUMMARY_JSON}"
+
+        with open(implement_summary_path, "w") as f:
+            json.dump(
+                {
+                    "phase": "implementation",
+                    "adw_id": adw_id,
+                    "slash_command": "/implement",
+                    "args": [plan_path],
+                    "path_to_slash_command_prompt": ".claude/commands/implement.md",
+                    "model": model,
+                    "working_dir": working_dir,
+                    "success": implement_response.success,
+                    "session_id": implement_response.session_id,
+                    "retry_code": implement_response.retry_code,
+                    "output": implement_response.output,
+                },
+                f,
+                indent=2,
+            )
+
+        # Show implement output files
+        console.print()
+
+        # Files saved panel for implement phase
+        implement_files_table = Table(show_header=True, box=None)
+        implement_files_table.add_column("File Type", style="bold cyan")
+        implement_files_table.add_column("Path", style="dim")
+        implement_files_table.add_column("Description", style="italic")
+
+        implement_files_table.add_row(
+            "JSONL Stream",
+            f"{implement_output_dir}/{OUTPUT_JSONL}",
+            "Raw streaming output from Claude Code",
+        )
+        implement_files_table.add_row(
+            "JSON Array",
+            f"{implement_output_dir}/{OUTPUT_JSON}",
+            "All messages as a JSON array",
+        )
+        implement_files_table.add_row(
+            "Final Object",
+            f"{implement_output_dir}/{FINAL_OBJECT_JSON}",
+            "Last message entry (final result)",
+        )
+        implement_files_table.add_row(
+            "Summary",
+            implement_summary_path,
+            "High-level execution summary with metadata",
+        )
+
+        console.print(
+            Panel(
+                implement_files_table,
+                title="[bold blue]📄 Implementation Output Files[/bold blue]",
+                border_style="blue",
+            )
+        )
+
+        # Show workflow summary
+        console.print()
+        console.print(Rule("[bold blue]Workflow Summary[/bold blue]"))
+        console.print()
+
+        summary_table = Table(show_header=True, box=None)
+        summary_table.add_column("Phase", style="bold cyan")
+        summary_table.add_column("Status", style="bold")
+        summary_table.add_column("Output Directory", style="dim")
+
+        # Planning phase row
+        planning_status = "✅ Success" if chore_response.success else "❌ Failed"
+        summary_table.add_row(
+            "Planning (/chore)",
+            planning_status,
+            f"./agents/{adw_id}/{planner_name}/",
+        )
+
+        # Implementation phase row
+        implement_status = "✅ Success" if implement_response.success else "❌ Failed"
+        summary_table.add_row(
+            "Implementation (/implement)",
+            implement_status,
+            f"./agents/{adw_id}/{builder_name}/",
+        )
+
+        console.print(summary_table)
+
+        # Create overall workflow summary
+        workflow_summary_path = f"./agents/{adw_id}/workflow_summary.json"
+        os.makedirs(f"./agents/{adw_id}", exist_ok=True)
+
+        with open(workflow_summary_path, "w") as f:
+            json.dump(
+                {
+                    "workflow": "chore_implement",
+                    "adw_id": adw_id,
+                    "prompt": prompt,
+                    "model": model,
+                    "working_dir": working_dir,
+                    "plan_path": plan_path,
+                    "phases": {
+                        "planning": {
+                            "success": chore_response.success,
+                            "session_id": chore_response.session_id,
+                            "agent": planner_name,
+                            "output_dir": f"./agents/{adw_id}/{planner_name}/",
+                        },
+                        "implementation": {
+                            "success": implement_response.success,
+                            "session_id": implement_response.session_id,
+                            "agent": builder_name,
+                            "output_dir": f"./agents/{adw_id}/{builder_name}/",
+                        },
+                    },
+                    "overall_success": chore_response.success
+                    and implement_response.success,
+                },
+                f,
+                indent=2,
+            )
+
+        console.print(
+            f"\n[bold cyan]Workflow summary:[/bold cyan] {workflow_summary_path}"
+        )
+        console.print()
+
+        # Exit with appropriate code
+        if chore_response.success and implement_response.success:
+            console.print(
+                "[bold green]✅ Workflow completed successfully![/bold green]"
+            )
+            sys.exit(0)
+        else:
+            console.print(
+                "[bold yellow]⚠️  Workflow completed with errors[/bold yellow]"
+            )
+            sys.exit(1)
+
+    except Exception as e:
+        console.print(
+            Panel(
+                f"[bold red]{str(e)}[/bold red]",
+                title="[bold red]❌ Unexpected Error[/bold red]",
+                border_style="red",
+            )
+        )
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="adws/adw_plan_implement_update_task.py">
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pydantic",
+#   "python-dotenv",
+#   "click",
+#   "rich",
+# ]
+# ///
+"""
+Run plan, implement, and update task workflow for multi-agent task processing.
+
+This script runs three slash commands in sequence:
+1. /plan - Creates a plan based on the task description
+2. /implement - Implements the plan created by /plan
+3. /update_task - Updates the task list with the result
+
+Usage:
+    # Method 1: Direct execution (requires uv)
+    ./adws/adw_plan_implement_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Implement OAuth2"
+
+    # Method 2: Using uv run
+    uv run adws/adw_plan_implement_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Add user profiles"
+
+Examples:
+    # Run with specific model
+    ./adws/adw_plan_implement_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Add JWT tokens" --model x-ai/grok-4
+
+    # Run with verbose output
+    ./adws/adw_plan_implement_update_task.py --adw-id abc123 --worktree-name feature-auth --task "Fix auth bug" --verbose
+"""
+
+import os
+import sys
+import json
+import re
+import subprocess
+from pathlib import Path
+from typing import Optional
+from datetime import datetime
+import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.rule import Rule
+
+# Add the adw_modules directory to the path so we can import agent
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "adw_modules"))
+
+from agent import (
+    AgentTemplateRequest,
+    AgentPromptResponse,
+    execute_template,
+)
+from utils import format_agent_status, format_worktree_status
+
+def print_status_panel(console, action: str, adw_id: str, worktree: str, phase: str = None, status: str = "info"):
+    """Print a status panel with timestamp and context.
+    
+    Args:
+        console: Rich console instance
+        action: The action being performed
+        adw_id: ADW ID for tracking
+        worktree: Worktree/branch name
+        phase: Optional phase name (build, plan, etc)
+        status: Status type (info, success, error)
+    """
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # Choose color based on status
+    if status == "success":
+        border_style = "green"
+        icon = "✅"
+    elif status == "error":
+        border_style = "red"
+        icon = "❌"
+    else:
+        border_style = "cyan"
+        icon = "🔄"
+    
+    # Build title with context
+    title_parts = [f"[{timestamp}]", adw_id[:6], worktree]
+    if phase:
+        title_parts.append(phase)
+    title = " | ".join(title_parts)
+    
+    console.print(
+        Panel(
+            f"{icon} {action}",
+            title=f"[bold {border_style}]{title}[/bold {border_style}]",
+            border_style=border_style,
+            padding=(0, 1),
+        )
+    )
+
+# Output file name constants
+OUTPUT_JSONL = "cc_raw_output.jsonl"
+OUTPUT_JSON = "cc_raw_output.json"
+FINAL_OBJECT_JSON = "cc_final_object.json"
+SUMMARY_JSON = "custom_summary_output.json"
+
+
+def extract_plan_path(output: str) -> str:
+    """Extract the plan file path from the plan command output."""
+    patterns = [
+        r"specs/plan-[a-zA-Z0-9\-]+\.md",
+        r"Created plan at:\s*(specs/plan-[a-zA-Z0-9\-]+\.md)",
+        r"Plan file:\s*(specs/plan-[a-zA-Z0-9\-]+\.md)",
+        r"path.*?:\s*(specs/plan-[a-zA-Z0-9\-]+\.md)",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, output, re.IGNORECASE | re.MULTILINE)
+        if match:
+            return match.group(1) if match.groups() else match.group(0)
+
+    # Provide more helpful error message showing what we were looking for
+    raise ValueError(
+        "Could not find plan file path in plan output. "
+        "Expected pattern like 'specs/plan-*.md' but none found."
+    )
+
+
+def get_current_commit_hash(working_dir: str) -> Optional[str]:
+    """Get the current git commit hash in the working directory."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=working_dir,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()[:9]  # Return first 9 characters of hash
+    except subprocess.CalledProcessError:
+        return None
+
+
+@click.command()
+@click.option(
+    "--adw-id",
+    required=True,
+    help="ADW ID for this task execution"
+)
+@click.option(
+    "--worktree-name",
+    required=True,
+    help="Name of the git worktree to work in"
+)
+@click.option(
+    "--task",
+    required=True,
+    help="Task description to implement"
+)
+@click.option(
+    "--model",
+    type=click.Choice(["x-ai/grok-4-fast", "x-ai/grok-4"]),
+    default="x-ai/grok-4-fast",
+    help="OpenRouter model to use",
+)
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose output"
+)
+def main(
+    adw_id: str,
+    worktree_name: str,
+    task: str,
+    model: str,
+    verbose: bool,
+):
+    """Run plan, implement, and update task workflow for multi-agent processing."""
+    console = Console()
+
+    # Calculate the worktree path and the actual working directory
+    # With sparse checkout, the structure is: trees/{worktree_name}/{target_directory}/
+    worktree_base_path = os.path.abspath(f"trees/{worktree_name}")
+    target_directory = "multi_agent_todone"
+    worktree_path = os.path.join(worktree_base_path, target_directory)
+    
+    # Check if worktree exists, create if needed
+    if not os.path.exists(worktree_base_path):
+        console.print(Panel(
+            f"[bold yellow]Worktree not found at: {worktree_base_path}[/bold yellow]\n\n"
+            "Creating worktree now...",
+            title="[bold yellow]⚠️  Worktree Missing[/bold yellow]",
+            border_style="yellow",
+        ))
+        
+        # Create worktree using the init_worktree command
+        init_request = AgentTemplateRequest(
+            agent_name="worktree-initializer",
+            slash_command="/init_worktree",
+            args=[worktree_name, target_directory],
+            adw_id=adw_id,
+            model=model,
+            working_dir=os.getcwd(),  # Run from project root
+        )
+        
+        # Print start message for worktree creation
+        print_status_panel(console, "Starting worktree creation", adw_id, worktree_name, "init")
+        
+        init_response = execute_template(init_request)
+        
+        # Print completion message
+        print_status_panel(console, "Completed worktree creation", adw_id, worktree_name, "init", "success")
+        
+        if init_response.success:
+            console.print(Panel(
+                f"[bold green]✅ Worktree created successfully at: {worktree_base_path}[/bold green]",
+                title="[bold green]Worktree Created[/bold green]",
+                border_style="green",
+            ))
+        else:
+            console.print(Panel(
+                f"[bold red]Failed to create worktree:\n{init_response.output}[/bold red]",
+                title="[bold red]❌ Worktree Creation Failed[/bold red]",
+                border_style="red",
+            ))
+            sys.exit(1)
+
+    # Set agent names for each phase
+    planner_name = f"planner-{worktree_name}"
+    builder_name = f"builder-{worktree_name}"
+    updater_name = f"updater-{worktree_name}"
+
+    console.print(
+        Panel(
+            f"[bold blue]ADW Plan-Implement-Update Workflow[/bold blue]\n\n"
+            f"[cyan]ADW ID:[/cyan] {adw_id}\n"
+            f"[cyan]Worktree:[/cyan] {worktree_name}\n"
+            f"[cyan]Task:[/cyan] {task}\n"
+            f"[cyan]Model:[/cyan] {model}\n"
+            f"[cyan]Working Dir:[/cyan] {worktree_path}",
+            title="[bold blue]🚀 Workflow Configuration[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    # Track workflow state
+    workflow_success = True
+    plan_path = None
+    commit_hash = None
+    error_message = None
+
+    # Phase 1: Run /plan command
+    console.print(Rule("[bold yellow]Phase 1: Planning (/plan)[/bold yellow]"))
+    console.print()
+
+    plan_request = AgentTemplateRequest(
+        agent_name=planner_name,
+        slash_command="/plan",
+        args=[adw_id, task],
+        adw_id=adw_id,
+        model=model,
+        working_dir=worktree_path,
+    )
+
+    # Display plan execution info
+    plan_info_table = Table(show_header=False, box=None, padding=(0, 1))
+    plan_info_table.add_column(style="bold cyan")
+    plan_info_table.add_column()
+
+    plan_info_table.add_row("ADW ID", adw_id)
+    plan_info_table.add_row("Phase", "Planning")
+    plan_info_table.add_row("Command", "/plan")
+    plan_info_table.add_row("Args", f'{adw_id} "{task}"')
+    plan_info_table.add_row("Model", model)
+    plan_info_table.add_row("Agent", planner_name)
+
+    console.print(
+        Panel(
+            plan_info_table,
+            title=f"[bold blue]🚀 Plan Inputs | {adw_id} | {worktree_name}[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    try:
+        # Print start message for plan phase
+        print_status_panel(console, "Starting plan creation", adw_id, worktree_name, "plan")
+        
+        # Execute the plan command
+        plan_response = execute_template(plan_request)
+        
+        # Print completion message
+        print_status_panel(console, "Completed plan creation", adw_id, worktree_name, "plan", "success")
+
+        if plan_response.success:
+            console.print(
+                Panel(
+                    plan_response.output if verbose else "Plan created successfully",
+                    title=f"[bold green]✅ Planning Success | {adw_id} | {worktree_name}[/bold green]",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
+
+            # Extract the plan path
+            try:
+                plan_path = extract_plan_path(plan_response.output)
+                console.print(f"\n[bold cyan]Plan created at:[/bold cyan] {plan_path}")
+            except ValueError as e:
+                workflow_success = False
+                error_message = f"Plan path extraction failed: {str(e)}"
+                console.print(
+                    Panel(
+                        f"[bold red]{error_message}[/bold red]\n\n"
+                        "The /plan command succeeded but could not find the plan file path in the output.\n"
+                        "Stopping workflow and marking task as failed.",
+                        title="[bold red]❌ Critical Error - Plan Path Not Found[/bold red]",
+                        border_style="red",
+                    )
+                )
+        else:
+            workflow_success = False
+            error_message = "Planning phase failed"
+            console.print(
+                Panel(
+                    plan_response.output,
+                    title=f"[bold red]❌ Planning Failed | {adw_id} | {worktree_name}[/bold red]",
+                    border_style="red",
+                    padding=(1, 2),
+                )
+            )
+
+        # Save plan phase summary
+        plan_output_dir = f"./agents/{adw_id}/{planner_name}"
+        plan_summary_path = f"{plan_output_dir}/{SUMMARY_JSON}"
+
+        with open(plan_summary_path, "w") as f:
+            json.dump(
+                {
+                    "phase": "planning",
+                    "adw_id": adw_id,
+                    "worktree_name": worktree_name,
+                    "task": task,
+                    "slash_command": "/plan",
+                    "args": [adw_id, task],
+                    "model": model,
+                    "working_dir": worktree_path,
+                    "success": plan_response.success,
+                    "session_id": plan_response.session_id,
+                    "plan_path": plan_path,
+                },
+                f,
+                indent=2,
+            )
+
+        # Phase 2: Run /implement command (only if planning succeeded)
+        if workflow_success and plan_path:
+            console.print()
+            console.print(Rule("[bold yellow]Phase 2: Implementation (/implement)[/bold yellow]"))
+            console.print()
+
+            implement_request = AgentTemplateRequest(
+                agent_name=builder_name,
+                slash_command="/implement",
+                args=[plan_path],
+                adw_id=adw_id,
+                model=model,
+                working_dir=worktree_path,
+            )
+
+            # Display implement execution info
+            implement_info_table = Table(show_header=False, box=None, padding=(0, 1))
+            implement_info_table.add_column(style="bold cyan")
+            implement_info_table.add_column()
+
+            implement_info_table.add_row("ADW ID", adw_id)
+            implement_info_table.add_row("Phase", "Implementation")
+            implement_info_table.add_row("Command", "/implement")
+            implement_info_table.add_row("Args", plan_path)
+            implement_info_table.add_row("Model", model)
+            implement_info_table.add_row("Agent", builder_name)
+
+            console.print(
+                Panel(
+                    implement_info_table,
+                    title=f"[bold blue]🚀 Implement Inputs | {adw_id} | {worktree_name}[/bold blue]",
+                    border_style="blue",
+                )
+            )
+            console.print()
+
+            # Print start message for implement phase
+            print_status_panel(console, "Starting implementation", adw_id, worktree_name, "implement")
+            
+            # Execute the implement command
+            implement_response = execute_template(implement_request)
+            
+            # Print completion message
+            print_status_panel(console, "Completed implementation", adw_id, worktree_name, "implement", "success")
+
+            if implement_response.success:
+                console.print(
+                    Panel(
+                        implement_response.output if verbose else "Implementation completed successfully",
+                        title=f"[bold green]✅ Implementation Success | {adw_id} | {worktree_name}[/bold green]",
+                        border_style="green",
+                        padding=(1, 2),
+                    )
+                )
+
+                # Get the commit hash after successful implementation
+                commit_hash = get_current_commit_hash(worktree_path)
+                if commit_hash:
+                    console.print(f"\n[bold cyan]Commit hash:[/bold cyan] {commit_hash}")
+            else:
+                workflow_success = False
+                error_message = "Implementation phase failed"
+                console.print(
+                    Panel(
+                        implement_response.output,
+                        title=f"[bold red]❌ Implementation Failed | {adw_id} | {worktree_name}[/bold red]",
+                        border_style="red",
+                        padding=(1, 2),
+                    )
+                )
+
+            # Save implement phase summary
+            implement_output_dir = f"./agents/{adw_id}/{builder_name}"
+            implement_summary_path = f"{implement_output_dir}/{SUMMARY_JSON}"
+
+            with open(implement_summary_path, "w") as f:
+                json.dump(
+                    {
+                        "phase": "implementation",
+                        "adw_id": adw_id,
+                        "worktree_name": worktree_name,
+                        "slash_command": "/implement",
+                        "args": [plan_path],
+                        "model": model,
+                        "working_dir": worktree_path,
+                        "success": implement_response.success,
+                        "session_id": implement_response.session_id,
+                        "commit_hash": commit_hash,
+                    },
+                    f,
+                    indent=2,
+                )
+        else:
+            # Implementation skipped due to planning issues
+            if not workflow_success:
+                console.print()
+                console.print(
+                    Panel(
+                        "[yellow]⏭️  Skipping implementation phase due to planning errors[/yellow]",
+                        title="[bold yellow]Implementation Skipped[/bold yellow]",
+                        border_style="yellow",
+                    )
+                )
+
+        # Phase 3: Run /update_task command (always run to update status)
+        console.print()
+        console.print(Rule("[bold yellow]Phase 3: Update Task (/update_task)[/bold yellow]"))
+        console.print()
+
+        # Determine the status to update
+        update_status = "success" if workflow_success and commit_hash else "failed"
+
+        update_request = AgentTemplateRequest(
+            agent_name=updater_name,
+            slash_command="/update_task",
+            args=[
+                adw_id,
+                worktree_name,
+                task,
+                update_status,
+                commit_hash or "",
+                error_message or ""
+            ],
+            adw_id=adw_id,
+            model=model,
+            working_dir=os.getcwd(),  # Run from project root to update main tasks.md
+        )
+
+        # Display update execution info
+        update_info_table = Table(show_header=False, box=None, padding=(0, 1))
+        update_info_table.add_column(style="bold cyan")
+        update_info_table.add_column()
+
+        update_info_table.add_row("ADW ID", adw_id)
+        update_info_table.add_row("Phase", "Update Task")
+        update_info_table.add_row("Command", "/update_task")
+        update_info_table.add_row("Status", update_status)
+        update_info_table.add_row("Model", model)
+        update_info_table.add_row("Agent", updater_name)
+
+        console.print(
+            Panel(
+                update_info_table,
+                title=f"[bold blue]🚀 Update Inputs | {adw_id} | {worktree_name}[/bold blue]",
+                border_style="blue",
+            )
+        )
+        console.print()
+
+        # Print start message for update phase
+        print_status_panel(console, "Starting task status update", adw_id, worktree_name, "update")
+        
+        # Execute the update command
+        update_response = execute_template(update_request)
+        
+        # Print completion message
+        print_status_panel(console, "Completed task status update", adw_id, worktree_name, "update", "success")
+
+        if update_response.success:
+            console.print(
+                Panel(
+                    update_response.output if verbose else "Task status updated successfully",
+                    title=f"[bold green]✅ Update Success | {adw_id} | {worktree_name}[/bold green]",
+                    border_style="green",
+                    padding=(1, 2),
+                )
+            )
+        else:
+            console.print(
+                Panel(
+                    update_response.output,
+                    title=f"[bold red]❌ Update Failed | {adw_id} | {worktree_name}[/bold red]",
+                    border_style="red",
+                    padding=(1, 2),
+                )
+            )
+
+        # Save update phase summary
+        update_output_dir = f"./agents/{adw_id}/{updater_name}"
+        update_summary_path = f"{update_output_dir}/{SUMMARY_JSON}"
+
+        with open(update_summary_path, "w") as f:
+            json.dump(
+                {
+                    "phase": "update_task",
+                    "adw_id": adw_id,
+                    "worktree_name": worktree_name,
+                    "task": task,
+                    "slash_command": "/update_task",
+                    "args": [adw_id, worktree_name, task, update_status, commit_hash or "", error_message or ""],
+                    "model": model,
+                    "working_dir": os.getcwd(),  # update_task runs from project root
+                    "success": update_response.success,
+                    "session_id": update_response.session_id,
+                    "final_status": update_status,
+                },
+                f,
+                indent=2,
+            )
+
+        # Show workflow summary
+        console.print()
+        console.print(Rule("[bold blue]Workflow Summary[/bold blue]"))
+        console.print()
+
+        summary_table = Table(show_header=True, box=None)
+        summary_table.add_column("Phase", style="bold cyan")
+        summary_table.add_column("Status", style="bold")
+        summary_table.add_column("Output Directory", style="dim")
+
+        # Planning phase row
+        planning_status = "✅ Success" if plan_response.success else "❌ Failed"
+        summary_table.add_row(
+            "Planning (/plan)",
+            planning_status,
+            f"./agents/{adw_id}/{planner_name}/",
+        )
+
+        # Implementation phase row
+        if plan_path and workflow_success:
+            implement_status = "✅ Success" if implement_response.success else "❌ Failed"
+            summary_table.add_row(
+                "Implementation (/implement)",
+                implement_status,
+                f"./agents/{adw_id}/{builder_name}/",
+            )
+        elif plan_response.success and not plan_path:
+            # Plan succeeded but couldn't extract path
+            summary_table.add_row(
+                "Implementation (/implement)",
+                "⏭️ Skipped (no plan path)",
+                "-",
+            )
+        elif not plan_response.success:
+            # Plan failed entirely
+            summary_table.add_row(
+                "Implementation (/implement)",
+                "⏭️ Skipped (plan failed)",
+                "-",
+            )
+
+        # Update phase row
+        update_status_display = "✅ Success" if update_response.success else "❌ Failed"
+        summary_table.add_row(
+            "Update Task (/update_task)",
+            update_status_display,
+            f"./agents/{adw_id}/{updater_name}/",
+        )
+
+        console.print(summary_table)
+
+        # Create overall workflow summary
+        workflow_summary_path = f"./agents/{adw_id}/workflow_summary.json"
+        os.makedirs(f"./agents/{adw_id}", exist_ok=True)
+
+        with open(workflow_summary_path, "w") as f:
+            json.dump(
+                {
+                    "workflow": "plan_implement_update_task",
+                    "adw_id": adw_id,
+                    "worktree_name": worktree_name,
+                    "task": task,
+                    "model": model,
+                    "working_dir": worktree_path,
+                    "plan_path": plan_path,
+                    "commit_hash": commit_hash,
+                    "phases": {
+                        "planning": {
+                            "success": plan_response.success,
+                            "session_id": plan_response.session_id,
+                            "agent": planner_name,
+                        },
+                        "implementation": {
+                            "success": implement_response.success if plan_path else False,
+                            "session_id": implement_response.session_id if plan_path else None,
+                            "agent": builder_name,
+                        } if plan_path else None,
+                        "update_task": {
+                            "success": update_response.success,
+                            "session_id": update_response.session_id,
+                            "agent": updater_name,
+                        },
+                    },
+                    "overall_success": workflow_success,
+                    "final_task_status": "success" if workflow_success and commit_hash else "failed",
+                },
+                f,
+                indent=2,
+            )
+
+        console.print(
+            f"\n[bold cyan]Workflow summary:[/bold cyan] {workflow_summary_path}"
+        )
+        console.print()
+
+        # Exit with appropriate code
+        if workflow_success:
+            console.print(
+                "[bold green]✅ Workflow completed successfully![/bold green]"
+            )
+            sys.exit(0)
+        else:
+            console.print(
+                "[bold yellow]⚠️  Workflow completed with errors[/bold yellow]"
+            )
+            sys.exit(1)
+
+    except Exception as e:
+        console.print(
+            Panel(
+                f"[bold red]{str(e)}[/bold red]",
+                title="[bold red]❌ Unexpected Error[/bold red]",
+                border_style="red",
+            )
+        )
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="adws/adw_prompt.py">
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pydantic",
+#   "python-dotenv",
+#   "click",
+#   "rich",
+# ]
+# ///
+"""
+Run an adhoc Claude Code prompt from the command line.
+
+Usage:
+    # Method 1: Direct execution (requires uv)
+    ./adw_prompt.py "Write a hello world Python script"
+
+    # Method 2: Using uv run
+    uv run adw_prompt.py "Write a hello world Python script"
+
+    # Method 3: Using Python directly (requires dependencies installed)
+    python adw_prompt.py "Write a hello world Python script"
+
+Examples:
+    # Run with specific model
+    ./adw_prompt.py "Explain this code" --model x-ai/grok-4
+
+    # Run with custom output file
+    ./adw_prompt.py "Create a FastAPI app" --output my_result.jsonl
+
+    # Run from a different working directory
+    ./adw_prompt.py "List files here" --working-dir /path/to/project
+
+    # Disable retry on failure
+    ./adw_prompt.py "Quick test" --no-retry
+
+    # Use custom agent name
+    ./adw_prompt.py "Debug this" --agent-name debugger
+"""
+
+import os
+import sys
+import json
+from pathlib import Path
+import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.syntax import Syntax
+from rich.text import Text
+
+# Add the adw_modules directory to the path so we can import agent
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "adw_modules"))
+
+from agent import (
+    prompt_claude_code,
+    AgentPromptRequest,
+    AgentPromptResponse,
+    prompt_claude_code_with_retry,
+    generate_short_id,
+)
+
+# Output file name constants
+OUTPUT_JSONL = "cc_raw_output.jsonl"
+OUTPUT_JSON = "cc_raw_output.json"
+FINAL_OBJECT_JSON = "cc_final_object.json"
+SUMMARY_JSON = "custom_summary_output.json"
+
+
+@click.command()
+@click.argument("prompt", required=True)
+@click.option(
+    "--model",
+    type=click.Choice(["x-ai/grok-4-fast", "x-ai/grok-4"]),
+    default="x-ai/grok-4-fast",
+    help="OpenRouter model to use",
+)
+@click.option(
+    "--output",
+    type=click.Path(),
+    help="Output file path (default: ./output/oneoff_<id>_output.jsonl)",
+)
+@click.option(
+    "--working-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True),
+    help="Working directory for the prompt execution (default: current directory)",
+)
+@click.option("--no-retry", is_flag=True, help="Disable automatic retry on failure")
+@click.option(
+    "--agent-name", default="oneoff", help="Agent name for tracking (default: oneoff)"
+)
+def main(
+    prompt: str,
+    model: str,
+    output: str,
+    working_dir: str,
+    no_retry: bool,
+    agent_name: str,
+):
+    """Run an adhoc Claude Code prompt from the command line."""
+    console = Console()
+
+    # Generate a unique ID for this execution
+    adw_id = generate_short_id()
+
+    # Set up output file path
+    if not output:
+        # Default: write to agents/<adw_id>/<agent_name>/
+        output_dir = Path(f"./agents/{adw_id}/{agent_name}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output = str(output_dir / OUTPUT_JSONL)
+
+    # Use current directory if no working directory specified
+    if not working_dir:
+        working_dir = os.getcwd()
+
+    # Create the prompt request
+    request = AgentPromptRequest(
+        prompt=prompt,
+        adw_id=adw_id,
+        agent_name=agent_name,
+        model=model,
+        dangerously_skip_permissions=True,
+        output_file=output,
+        working_dir=working_dir,
+    )
+
+    # Create execution info table
+    info_table = Table(show_header=False, box=None, padding=(0, 1))
+    info_table.add_column(style="bold cyan")
+    info_table.add_column()
+
+    info_table.add_row("ADW ID", adw_id)
+    info_table.add_row("ADW Name", "adw_prompt")
+    info_table.add_row("Prompt", prompt)
+    info_table.add_row("Model", model)
+    info_table.add_row("Working Dir", working_dir)
+    info_table.add_row("Output", output)
+
+    console.print(
+        Panel(
+            info_table,
+            title="[bold blue]🚀 Inputs[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    response: AgentPromptResponse | None = None
+
+    try:
+        # Execute the prompt
+        with console.status("[bold yellow]Executing prompt...[/bold yellow]"):
+            if no_retry:
+                # Direct execution without retry
+
+                response = prompt_claude_code(request)
+            else:
+                # Execute with retry logic
+                response = prompt_claude_code_with_retry(request)
+
+        # Display the result
+        if response.success:
+            # Success panel
+            result_panel = Panel(
+                response.output,
+                title="[bold green]✅ Success[/bold green]",
+                border_style="green",
+                padding=(1, 2),
+            )
+            console.print(result_panel)
+
+            if response.session_id:
+                console.print(
+                    f"\n[bold cyan]Session ID:[/bold cyan] {response.session_id}"
+                )
+        else:
+            # Error panel
+            error_panel = Panel(
+                response.output,
+                title="[bold red]❌ Failed[/bold red]",
+                border_style="red",
+                padding=(1, 2),
+            )
+            console.print(error_panel)
+
+            if response.retry_code != "none":
+                console.print(
+                    f"\n[bold yellow]Retry code:[/bold yellow] {response.retry_code}"
+                )
+
+        # Show output file info
+        console.print()
+
+        # Also create a JSON summary file
+        if output.endswith(f"/{OUTPUT_JSONL}"):
+            # Default path: save as custom_summary_output.json in same directory
+            simple_json_output = output.replace(f"/{OUTPUT_JSONL}", f"/{SUMMARY_JSON}")
+        else:
+            # Custom path: replace .jsonl with _summary.json
+            simple_json_output = output.replace(".jsonl", "_summary.json")
+
+        with open(simple_json_output, "w") as f:
+            json.dump(
+                {
+                    "adw_id": adw_id,
+                    "prompt": prompt,
+                    "model": model,
+                    "working_dir": working_dir,
+                    "success": response.success,
+                    "session_id": response.session_id,
+                    "retry_code": response.retry_code,
+                    "output": response.output,
+                },
+                f,
+                indent=2,
+            )
+
+        # Files saved panel with descriptions
+        files_table = Table(show_header=True, box=None)
+        files_table.add_column("File Type", style="bold cyan")
+        files_table.add_column("Path", style="dim")
+        files_table.add_column("Description", style="italic")
+
+        # Determine paths for all files
+        output_dir = os.path.dirname(output)
+        json_array_path = os.path.join(output_dir, OUTPUT_JSON)
+        final_object_path = os.path.join(output_dir, FINAL_OBJECT_JSON)
+
+        files_table.add_row(
+            "JSONL Stream", output, "Raw streaming output from Claude Code"
+        )
+        files_table.add_row(
+            "JSON Array", json_array_path, "All messages as a JSON array"
+        )
+        files_table.add_row(
+            "Final Object", final_object_path, "Last message entry (final result)"
+        )
+        files_table.add_row(
+            "Summary", simple_json_output, "High-level execution summary with metadata"
+        )
+
+        console.print(
+            Panel(
+                files_table,
+                title="[bold blue]📄 Output Files[/bold blue]",
+                border_style="blue",
+            )
+        )
+
+        # Exit with appropriate code
+        sys.exit(0 if response.success else 1)
+
+    except Exception as e:
+        console.print(
+            Panel(
+                f"[bold red]{str(e)}[/bold red]",
+                title="[bold red]❌ Unexpected Error[/bold red]",
+                border_style="red",
+            )
+        )
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="adws/adw_slash_command.py">
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pydantic",
+#   "python-dotenv",
+#   "click",
+#   "rich",
+# ]
+# ///
+"""
+Run Claude Code slash commands from the command line.
+
+Usage:
+    # Method 1: Direct execution (requires uv)
+    ./adws/adw_slash_command.py /chore "Update documentation"
+
+    # Method 2: Using uv run
+    uv run adws/adw_slash_command.py /implement specs/<name-of-spec>.md
+
+    uv run adws/adw_slash_command.py /start
+
+
+Examples:
+    # Run a slash command
+    ./adws/adw_slash_command.py /chore "Add logging to agent.py"
+
+    # Run with specific model
+    ./adws/adw_slash_command.py /implement plan.md --model x-ai/grok-4
+
+    # Run from a different working directory
+    ./adws/adw_slash_command.py /test --working-dir /path/to/project
+
+    # Use custom agent name
+    ./adws/adw_slash_command.py /review --agent-name reviewer
+"""
+
+import os
+import sys
+import json
+from pathlib import Path
+import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+# Add the adw_modules directory to the path so we can import agent
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "adw_modules"))
+
+from agent import (
+    AgentTemplateRequest,
+    AgentPromptResponse,
+    execute_template,
+    generate_short_id,
+)
+
+# Output file name constants
+OUTPUT_JSONL = "cc_raw_output.jsonl"
+OUTPUT_JSON = "cc_raw_output.json"
+FINAL_OBJECT_JSON = "cc_final_object.json"
+SUMMARY_JSON = "custom_summary_output.json"
+
+
+@click.command()
+@click.argument("slash_command", required=True)
+@click.argument("args", nargs=-1)  # Accept multiple optional arguments
+@click.option(
+    "--model",
+    type=click.Choice(["x-ai/grok-4-fast", "x-ai/grok-4"]),
+    default="x-ai/grok-4-fast",
+    help="OpenRouter model to use",
+)
+@click.option(
+    "--working-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True),
+    help="Working directory for command execution (default: current directory)",
+)
+@click.option(
+    "--agent-name",
+    default="executor",
+    help="Agent name for tracking (default: executor)",
+)
+def main(
+    slash_command: str,
+    args: tuple,
+    model: str,
+    working_dir: str,
+    agent_name: str,
+):
+    """Run Claude Code slash commands from the command line."""
+    console = Console()
+
+    # Generate a unique ID for this execution
+    adw_id = generate_short_id()
+
+    # Use current directory if no working directory specified
+    if not working_dir:
+        working_dir = os.getcwd()
+
+    # Create the template request
+    request = AgentTemplateRequest(
+        agent_name=agent_name,
+        slash_command=slash_command,
+        args=list(args),  # Convert tuple to list
+        adw_id=adw_id,
+        model=model,
+        working_dir=working_dir,
+    )
+
+    # Create execution info table
+    info_table = Table(show_header=False, box=None, padding=(0, 1))
+    info_table.add_column(style="bold cyan")
+    info_table.add_column()
+
+    info_table.add_row("ADW ID", adw_id)
+    info_table.add_row("ADW Name", "adw_slash_command")
+    info_table.add_row("Command", slash_command)
+    info_table.add_row("Args", " ".join(args) if args else "(none)")
+    info_table.add_row("Model", model)
+    info_table.add_row("Working Dir", working_dir)
+
+    console.print(
+        Panel(
+            info_table,
+            title="[bold blue]🚀 Inputs[/bold blue]",
+            border_style="blue",
+        )
+    )
+    console.print()
+
+    try:
+        # Execute the slash command
+        with console.status("[bold yellow]Executing command...[/bold yellow]"):
+            response = execute_template(request)
+
+        # Display the result
+        if response.success:
+            # Success panel
+            result_panel = Panel(
+                response.output,
+                title="[bold green]✅ Success[/bold green]",
+                border_style="green",
+                padding=(1, 2),
+            )
+            console.print(result_panel)
+
+            if response.session_id:
+                console.print(
+                    f"\n[bold cyan]Session ID:[/bold cyan] {response.session_id}"
+                )
+        else:
+            # Error panel
+            error_panel = Panel(
+                response.output,
+                title="[bold red]❌ Failed[/bold red]",
+                border_style="red",
+                padding=(1, 2),
+            )
+            console.print(error_panel)
+
+            if response.retry_code != "none":
+                console.print(
+                    f"\n[bold yellow]Retry code:[/bold yellow] {response.retry_code}"
+                )
+
+        # Show output file info
+        console.print()
+
+        # Output files are in agents/<adw_id>/<agent_name>/
+        output_dir = f"./agents/{adw_id}/{agent_name}"
+        
+        # Create the simple JSON summary file
+        simple_json_output = f"{output_dir}/{SUMMARY_JSON}"
+        
+        # Determine the template file path
+        command_name = slash_command.lstrip("/")  # Remove leading slash
+        path_to_slash_command_prompt = f".claude/commands/{command_name}.md"
+        
+        with open(simple_json_output, "w") as f:
+            json.dump(
+                {
+                    "adw_id": adw_id,
+                    "slash_command": slash_command,
+                    "args": list(args),
+                    "path_to_slash_command_prompt": path_to_slash_command_prompt,
+                    "model": model,
+                    "working_dir": working_dir,
+                    "success": response.success,
+                    "session_id": response.session_id,
+                    "retry_code": response.retry_code,
+                    "output": response.output,
+                },
+                f,
+                indent=2,
+            )
+
+        # Files saved panel
+        files_table = Table(show_header=True, box=None)
+        files_table.add_column("File Type", style="bold cyan")
+        files_table.add_column("Path", style="dim")
+        files_table.add_column("Description", style="italic")
+
+        files_table.add_row(
+            "JSONL Stream",
+            f"{output_dir}/{OUTPUT_JSONL}",
+            "Raw streaming output from Claude Code",
+        )
+        files_table.add_row(
+            "JSON Array",
+            f"{output_dir}/{OUTPUT_JSON}",
+            "All messages as a JSON array",
+        )
+        files_table.add_row(
+            "Final Object",
+            f"{output_dir}/{FINAL_OBJECT_JSON}",
+            "Last message entry (final result)",
+        )
+        files_table.add_row(
+            "Summary",
+            simple_json_output,
+            "High-level execution summary with metadata",
+        )
+
+        console.print(
+            Panel(
+                files_table,
+                title="[bold blue]📄 Output Files[/bold blue]",
+                border_style="blue",
+            )
+        )
+
+        # Exit with appropriate code
+        sys.exit(0 if response.success else 1)
+
+    except Exception as e:
+        console.print(
+            Panel(
+                f"[bold red]{str(e)}[/bold red]",
+                title="[bold red]❌ Unexpected Error[/bold red]",
+                border_style="red",
+            )
+        )
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="adws/README.md">
+# AI Developer Workflows (ADWs)
+
+## Overview
+
+The `adws/` directory contains the **AI Developer Workflows** - the highest level of abstraction in the agentic layer. These are executable Python scripts that orchestrate Claude Code agents to perform complex development tasks on your application layer (`apps/*`).
+
+ADWs compose prompts from `.claude/commands/*.md` templates and execute them through the Claude Code CLI, providing a programmatic interface for agentic coding workflows.
+
+## Architecture
+
+```
+adws/
+   README.md                    # This file
+   adw_prompt.py               # Direct prompt execution
+   adw_slash_command.py        # Slash command execution
+   adw_chore_implement.py      # Compound workflow (planning + implementation)
+   adw_modules/
+       agent.py                # Core agent execution module
+```
+
+## Key Components
+
+### 1. Core Module: `agent.py`
+
+The foundation module that provides:
+- **AgentPromptRequest/Response**: Data models for prompt execution
+- **AgentTemplateRequest**: Data model for slash command execution
+- **prompt_claude_code()**: Direct Claude Code CLI execution
+- **prompt_claude_code_with_retry()**: Execution with automatic retry logic
+- **execute_template()**: Slash command template execution
+- **Environment management**: Safe subprocess environment handling
+- **Output parsing**: JSONL to JSON conversion and result extraction
+
+### 2. Direct Prompt Execution: `adw_prompt.py`
+
+Execute adhoc Claude Code prompts from the command line.
+
+**Usage:**
+```bash
+# Direct execution (requires uv)
+./adws/adw_prompt.py "Write a hello world Python script"
+
+# With specific model
+./adws/adw_prompt.py "Explain this code" --model x-ai/grok-4
+
+# From different directory
+./adws/adw_prompt.py "List files here" --working-dir /path/to/project
+```
+
+**Features:**
+- Direct prompt execution without templates
+- Configurable models (grok-4-fast/grok-4)
+- Custom output paths
+- Automatic retry on failure
+- Rich console output with progress indicators
+
+### 3. Slash Command Execution: `adw_slash_command.py`
+
+Execute predefined slash commands from `.claude/commands/*.md` templates.
+
+**Usage:**
+```bash
+# Run a slash command
+./adws/adw_slash_command.py /chore "Add logging to agent.py"
+
+# With arguments
+./adws/adw_slash_command.py /implement specs/feature.md
+
+# Start a new session
+./adws/adw_slash_command.py /start
+```
+
+**Available Commands:**
+- `/chore` - Create implementation plans
+- `/implement` - Execute implementation plans
+- `/prime` - Prime the agent with context
+- `/start` - Start a new agent session
+
+### 4. Compound Workflow: `adw_chore_implement.py`
+
+Orchestrates a two-phase workflow: planning (/chore) followed by implementation (/implement).
+
+**Usage:**
+```bash
+# Plan and implement a feature
+./adws/adw_chore_implement.py "Add error handling to all API endpoints"
+
+# With specific model
+./adws/adw_chore_implement.py "Refactor database logic" --model x-ai/grok-4
+```
+
+**Workflow Phases:**
+1. **Planning Phase**: Executes `/chore` to create a detailed plan
+2. **Implementation Phase**: Automatically executes `/implement` with the generated plan
+
+## SDK-Based ADWs
+
+In addition to subprocess-based execution, ADWs now support the Claude Code Python SDK for better type safety and native async/await patterns.
+
+### SDK Module: `agent_sdk.py`
+
+The SDK module provides idiomatic patterns for using the Claude Code Python SDK:
+- **Simple queries** - `simple_query()` for basic text responses  
+- **Tool-enabled queries** - `query_with_tools()` for operations requiring tools
+- **Interactive sessions** - `create_session()` context manager for conversations
+- **Error handling** - `safe_query()` with SDK-specific exception handling
+
+### SDK Execution: `adw_sdk_prompt.py`
+
+Execute Claude Code using the Python SDK instead of subprocess.
+
+**Usage:**
+```bash
+# One-shot query
+./adws/adw_sdk_prompt.py "Write a hello world Python script"
+
+# Interactive session  
+./adws/adw_sdk_prompt.py --interactive
+
+# With tools
+./adws/adw_sdk_prompt.py "Create hello.py" --tools Write,Read
+
+# Interactive with context
+./adws/adw_sdk_prompt.py --interactive --context "Debugging a memory leak"
+```
+
+### SDK vs Subprocess
+
+| Feature | Subprocess (agent.py) | SDK (agent_sdk.py) |
+|---------|----------------------|-------------------|
+| Type Safety | Basic dictionaries | Typed message objects |
+| Error Handling | Generic exceptions | SDK-specific exceptions |
+| Async Support | Subprocess management | Native async/await |
+| Interactive Sessions | Not supported | ClaudeSDKClient |
+
+## Output Structure
+
+All ADWs generate structured output in the `agents/` directory:
+
+```
+agents/
+   {adw_id}/                   # Unique 8-character ID per execution
+       {agent_name}/            # Agent-specific outputs
+          cc_raw_output.jsonl  # Raw streaming output
+          cc_raw_output.json   # Parsed JSON array
+          cc_final_object.json # Final result object
+          custom_summary_output.json # High-level summary
+       workflow_summary.json    # Overall workflow summary (compound workflows)
+```
+
+## Data Flow
+
+1. **Input**: User provides prompt/command + arguments
+2. **Template Composition**: ADW loads slash command template from `.claude/commands/`
+3. **Execution**: Claude Code CLI processes the prompt
+4. **Output Parsing**: JSONL stream parsed into structured JSON
+5. **Result Storage**: Multiple output formats saved for analysis
+
+## Key Features
+
+### Retry Logic
+- Automatic retry for transient failures
+- Configurable retry attempts and delays
+- Different retry codes for various error types
+
+### Environment Safety
+- Filtered environment variables for subprocess execution
+- Only passes required variables (API keys, paths, etc.)
+- Prevents environment variable leakage
+
+### Rich Console UI
+- Progress indicators during execution
+- Colored output panels for success/failure
+- Structured tables showing inputs and outputs
+- File path listings for generated outputs
+
+### Session Tracking
+- Unique ADW IDs for each execution
+- Session IDs from Claude Code for debugging
+- Comprehensive logging and output capture
+
+## Best Practices
+
+1. **Use the Right Tool**:
+   - `adw_prompt.py` for one-off tasks
+   - `adw_slash_command.py` for templated operations
+   - `adw_chore_implement.py` for complex features
+   - `adw_sdk_prompt.py` for type-safe SDK operations or interactive sessions
+
+2. **Model Selection**:
+   - Use `grok-4-fast` (default) for most tasks
+   - Use `grok-4` for complex reasoning or large codebases
+
+3. **Working Directory**:
+   - Always specify `--working-dir` when operating on different projects
+   - ADWs respect `.mcp.json` configuration in working directories
+
+4. **Output Analysis**:
+   - Check `custom_summary_output.json` for high-level results
+   - Use `cc_final_object.json` for the final agent response
+   - Review `cc_raw_output.jsonl` for debugging
+
+## Integration Points
+
+- **Slash Commands**: Defined in `.claude/commands/*.md`
+- **Application Layer**: Operates on code in `apps/*`
+- **Specifications**: Can implement plans from `specs/*`
+- **AI Documentation**: May reference `ai_docs/*` for context
+
+## Error Handling
+
+ADWs implement robust error handling:
+- Installation checks for Claude Code CLI
+- Timeout protection (5-minute default)
+- Graceful failure with informative error messages
+- Retry codes for different failure types
+- Output truncation to prevent console flooding
+
+---
+
+The ADW layer represents the pinnacle of abstraction in agentic coding, turning high-level developer intentions into executed code changes through intelligent agent orchestration.
+</file>
+
+<file path="apps/sentiment_classification/.python-version">
+3.12
+</file>
+
+<file path="apps/sentiment_classification/main.py">
+def main():
+    print("Hello from sentiment-classification!")
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="apps/sentiment_classification/pyproject.toml">
+[project]
+name = "sentiment-classification"
+version = "0.1.0"
+description = "Sentiment classification application with Jupyter notebook support"
+requires-python = ">=3.12"
+dependencies = [
+    "jupyter",
+    "ipykernel",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "transformers",
+    "torch",
+    "datasets",
+    "nltk",
+    "wordcloud",
+]
+</file>
+
+<file path="apps/sentiment_classification/README.md">
+# Sentiment Classification Application
+
+A Jupyter notebook-based sentiment classification application using both traditional machine learning and transformer-based approaches.
+
+## Setup
+
+This project uses `uv` for dependency management. The virtual environment and dependencies have been configured.
+
+### Prerequisites
+- Python 3.12+
+- uv package manager
+
+### Installation
+```bash
+# Dependencies are already configured in pyproject.toml
+# To reinstall/update:
+uv sync
+```
+
+## Project Structure
+```
+sentiment_classification/
+├── .venv/                  # Virtual environment (created by uv)
+├── pyproject.toml          # Project configuration and dependencies
+├── notebooks/              # Jupyter notebooks
+│   └── 01_sentiment_classification_example.ipynb
+├── data/                   # Data storage (empty, for future datasets)
+├── models/                 # Trained model storage
+└── README.md              # This file
+```
+
+## Running Notebooks
+
+### Option 1: Using uv run
+```bash
+# Start Jupyter Lab
+uv run jupyter lab
+
+# Or start classic Jupyter Notebook
+uv run jupyter notebook
+```
+
+### Option 2: Activate venv directly
+```bash
+# Activate the virtual environment
+source .venv/bin/activate  # On macOS/Linux
+# or
+.venv\Scripts\activate  # On Windows
+
+# Then run Jupyter
+jupyter lab
+```
+
+## Features
+
+The example notebook demonstrates:
+- Text preprocessing for sentiment analysis
+- Traditional ML approach using TF-IDF and Logistic Regression
+- Transformer-based approach using pre-trained DistilBERT
+- Data visualization with word clouds
+- Model comparison and batch processing
+- Custom sentiment analysis functions
+
+## Dependencies
+
+Key packages included:
+- **Jupyter ecosystem**: jupyter, ipykernel, jupyterlab
+- **Data science**: numpy, pandas, scikit-learn
+- **Visualization**: matplotlib, seaborn, wordcloud
+- **NLP**: nltk, transformers, torch
+- **ML frameworks**: transformers, datasets
+
+## Next Steps
+
+1. Add real-world datasets (IMDB, Twitter, etc.)
+2. Fine-tune transformer models
+3. Build REST API for model serving
+4. Add multi-language support
+5. Implement aspect-based sentiment analysis
+</file>
+
+<file path="specs/plan-adw01-multi-agent-task-list.md">
+# Plan: Multi-Agent Task List Architecture
+
+## Metadata
+adw_id: `adw01`
+prompt: `# Specification
+
+We're building a multi-agent task list architecture that wraps a primary application layer.
+There are two main components:
+- Agentic Layer (.claude/commands + adws/*)
+- Application Layer (apps/*)
+
+The idea here is simple. We update a task list, which a cron file picks up which then we kick off agents to do the work. Agents operate in groups on their own git worktrees.
+When the agents complete work or fail, they update the task list. We leverage the agentic layer of our codebase .claude/* and adws/* to build out the agents and workflows.
+Below our additional details.
+
+## Setup
+
+Before starting your work run the following commands
+- Read and execute .claude/commands/prime.md to understand the codebase.
+- Read and understand the structure of all .claude/commands/*.md prompt files. When we create new files in this directory we're going to write prompts in this format for our agents to use.
+
+## Key Files
+> some exists and some are new, track which need to be created as you build out the new plan.
+
+- tasks.md - this is the task list that is used to track the state of the tasks. human engineers and agents will update this file.
+- .claude/commands/ - this is where we'll store our prompts that we'll use for the steps in the process
+- adws/adw_triggers/adw_trigger_cron_todone.py - this is a cron job that runs every 5 (N seconds configurable) seconds and checks for tasks that are ready to be picked up by an agent. It does the following
+  - It runs the /process_tasks command to get a list of tasks to pick up. 
+  - Creates unique adw_ids for each. 
+  - Immediately updates the task list and marks the tasks as [🟡 <adw_id>] work in progress so the next cron run does not pick up the same task again with the adw id attached. 
+  - Then it if this is the first time a task is being picked up, we'll create a work tree /.claude/commands/init_worktree.md.
+  - Then it will delegate each task to the adws/adw_plan_implement_update_task.py workflow one at a time - spinning up one instance per task.
+- .claude/commands/plan.md - this is a template prompt that creates a plan for a task that gets called in the adws/adw_plan_implement_update_task.py workflow as the first step. (already built)
+- .claude/commands/implement.md - this is a template prompt that implements the plan for a task that gets called in the adws/adw_plan_implement_update_task.py workflow as the second step. (already built)
+- .claude/commands/init_worktree.md - this is a template prompt that creates a git work tree in the trees/<worktree_name> directory. It is used to initialize a work tree when a task is picked up for the first time. Note we'll also need to copy over .env to make sure the agent has everything they need to get running.
+- adws/adw_modules/data_models.py - use this to define data models for the work we're going to do throughout this process. Use pydantic.
+- .claude/commands/process_tasks.md - this reads in the current state of the task list and decides which tasks to pick up by returning a list of tasks top to bottom as a json array. The agent will immediately update the list and mark the tasks as [🟡] work in progress so the next cron run does not pick up the same task again. (kicked off by cron job with a template command /process_tasks). Note, we cannot process blocked tasks [⏰], until the tasks above them are completed. Note, this task only determines what needs to be done, it does not do the work or update the task list at all. This is the object structure that is returned.
+  ```json
+  [
+    {
+      worktree_name: "worktree_name",
+      tasks_to_start: [{
+        description: "task description",
+        tags: ["tag1", "tag2", "tag3"]
+      }]
+    }
+  ]
+  ```
+- adws/adw_plan_implement_update_task.py - this ai developer workflow will run three templates prompts: /plan, /implement, /update_task. see adws/adw_chore_implement.py to understand how to build a multi-agent workflow. note make sure we pass the adw_id and the worktree_name to the workflow and use the path to the worktree as the working directory for every prompt that runs, this is critical.
+- .claude/commands/update_task.md - this updates the task list based on individual agents response as the last step of the adws/adw_plan_implement_update_task.py and marks work as [✅] success or [❌] failed. These states mark the end of a task (kicked off by agent doing work, at the end their work will call). This specifically updates the task list with the adw_id and the commit hash.
+
+
+## Task state machine
+
+Simple state machine to understand the flow of task states and how updates them.
+
+```pseudo-mermaid
+stateDiagram-v2
+
+    <!-- human engineer creates a task -->
+    start --> []
+    start --> [⏰]
+    
+    <!-- our cron agent picks these up and processes them  -->
+    [] --> [🟡]
+    [⏰] --> [🟡]
+    
+    [🟡] --> [✅]
+    [🟡] --> [❌]
+    
+    [✅] --> end
+    [❌] --> end
+```
+
+
+## Details
+
+- ToDone - multi-agent-task-list - MATL 
+- One task represents a unit of engineering work that will result in one commit
+- Agents only perform a single task at a time and are only focused on that task.
+- We have a cron job that runs every 5 seconds that checks for 
+- adw_trigger_cron_todone.py only acts on [] and [⏰] tasks. And only on [⏰] tasks that have ONLY have success tasks above them. These are blocking tasks.
+- Statuses:
+  - [✅] success - the work has been completed and committed
+  - [🟡] work in progress - an agent has picked up the task and is working on it
+  - [❌] failed - the agent failed to complete the task and has stopped working on it
+  - [] not started - this task is ready to be picked up by an agent
+  - [⏰] not started and blocked - This task cannot be started until all tasks above it are completed
+
+## Example tasks.md file
+
+```md
+
+# ATL
+
+## Git Worktree <name the worktree>
+[✅ <commit_hash>, <adw_id>] <description>
+[🟡, <adw_id>] <description>
+[❌, <adw_id>] <description>
+[] <description> {tag}
+[⏰] <description>
+[] <description>
+
+## Git Worktree <name the worktree>
+[✅ <commit_hash>, <adw_id>] <description>
+[🟡, <adw_id>] <description>
+[❌, <adw_id>] <description>
+[] <description>
+[⏰] <description>
+
+...
+```
+`
+task_type: feature
+complexity: complex
+
+## Task Description
+Build a multi-agent task list architecture that enables autonomous agents to pick up, process, and complete engineering tasks from a shared task list. The system will use git worktrees to isolate agent work, a cron job to orchestrate task distribution, and a state machine to track task progress. Agents will execute tasks through a three-phase workflow (plan, implement, update) and update the task list with their results.
+
+## Objective
+Create a fully functional multi-agent task management system where:
+- Human engineers can add tasks to a markdown-based task list
+- A cron job automatically distributes tasks to agents
+- Agents work in isolated git worktrees to prevent conflicts
+- Tasks progress through a defined state machine with clear status indicators
+- The system automatically tracks task completion and failures
+
+## Problem Statement
+Currently, there's no automated system to distribute and track engineering tasks across multiple autonomous agents. This makes it difficult to:
+- Parallelize development work across multiple agents
+- Track the state and progress of multiple concurrent tasks
+- Ensure agents don't conflict with each other's work
+- Maintain a clear audit trail of what work was done by which agent
+
+## Solution Approach
+Build a task orchestration system with:
+1. A markdown-based task list (`tasks.md`) that serves as the central task queue
+2. Slash command templates that define agent behaviors for processing tasks
+3. A cron job that monitors the task list and dispatches work to agents
+4. Git worktrees to isolate each agent's work environment
+5. A multi-phase workflow (plan → implement → update) for task execution
+6. Pydantic data models to ensure type safety across the system
+
+## Relevant Files
+Use these files to complete the task:
+
+- `deep_docs/uv_single_file_scripts.md` - uv single file scripts guide
+- `README.md` - Project overview to understand the agentic and application layers
+- `adws/README.md` - ADW architecture documentation for building workflows
+- `.claude/commands/plan.md` - Existing planning template (reference)
+- `.claude/commands/implement.md` - Existing implementation template (reference)
+- `.claude/commands/chore.md` - Example slash command template structure
+- `adws/adw_chore_implement.py` - Reference implementation of multi-agent workflow
+- `adws/adw_modules/agent.py` - Core agent execution module
+- `adws/adw_triggers/adw_trigger_cron_todone.py` - Existing cron trigger to modify (uv single file script)
+
+### New Files
+- `tasks.md` - Central task list file
+- `.claude/commands/process_tasks.md` - Template to analyze and select tasks
+- `.claude/commands/init_worktree.md` - Template to create git worktrees
+- `.claude/commands/update_task.md` - Template to update task status
+- `adws/adw_modules/data_models.py` - Pydantic models for the system
+- `adws/adw_plan_implement_update_task.py` - Three-phase workflow executor (uv single file script)
+
+## Implementation Phases
+
+### Phase 1: Foundation
+Create the core data models and basic task list structure:
+- Define Pydantic models for tasks, worktrees, and workflow states
+- Create initial `tasks.md` with example structure
+- Build the `/process_tasks` command template
+
+### Phase 2: Core Implementation
+Build the main workflow components:
+- Create `/init_worktree` and `/update_task` command templates
+- Implement the three-phase workflow executor
+- Modify the cron trigger to orchestrate task distribution
+
+### Phase 3: Integration & Polish
+Connect all components and add robustness:
+- Test the complete workflow end-to-end
+- Add error handling and recovery mechanisms
+- Create documentation and usage examples
+
+## Step by Step Tasks
+IMPORTANT: Execute every step in order, top to bottom.
+
+### 1. Define Data Models
+- Create comprehensive Pydantic models in `adws/adw_modules/data_models.py`
+- Define `Task`, `Worktree`, `ProcessTasksResponse`, and `TaskUpdate` models
+- Include proper validation and documentation for each field
+
+### 2. Create Task List File
+- Create `tasks.md` with the specified markdown structure
+- Add example worktrees and tasks demonstrating all status types
+- Include proper formatting with status indicators and metadata
+
+### 3. Build Process Tasks Command
+- Create `.claude/commands/process_tasks.md` template
+- Implement logic to parse task list and identify eligible tasks
+- Return structured JSON response with worktree groupings
+- Handle blocked task detection based on upstream task status
+
+### 4. Create Worktree Initialization Command
+- Create `.claude/commands/init_worktree.md` template
+- Implement git worktree creation in `trees/<worktree_name>` directory
+- Copy `.env` file to new worktree for agent configuration
+- Set up proper branch naming and initial commit
+
+### 5. Build Task Update Command
+- Create `.claude/commands/update_task.md` template
+- Implement task status updates with proper metadata (adw_id, commit hash)
+- Handle both success and failure scenarios
+- Preserve task list formatting and structure
+
+### 6. Implement Three-Phase Workflow
+- Create `adws/adw_plan_implement_update_task.py` based on `adw_chore_implement.py`
+- Add parameters for adw_id and worktree_name
+- Configure working directory to use worktree path for all commands
+- Chain `/plan`, `/implement`, and `/update_task` commands
+
+### 7. Modify Cron Trigger
+- Update `adws/adw_triggers/adw_trigger_cron_todone.py`
+- Add logic to call `/process_tasks` command
+- Generate unique adw_ids for each task
+- Update task statuses to [🟡] before delegation
+- Check for first-time worktree creation needs
+- Delegate to `adw_plan_implement_update_task.py` workflow
+
+### 8. Add Error Handling
+- Implement proper exception handling in all components
+- Add retry logic for transient failures
+- Ensure task list updates are atomic to prevent corruption
+- Log all operations for debugging
+
+### 9. Create Integration Tests
+- Write test scenarios for different task configurations
+- Test blocked task handling
+- Verify worktree isolation
+- Test failure scenarios and recovery
+
+### 10. Validate Complete System
+- Run end-to-end test with multiple tasks
+- Verify agents work in isolation
+- Check task state transitions
+- Ensure proper git commits are created
+
+## Testing Strategy
+1. **Unit Tests**: Test individual components (data models, parsers, status updates)
+2. **Integration Tests**: Test workflow chains and command interactions
+3. **System Tests**: Full end-to-end testing with multiple concurrent agents
+4. **Edge Cases**:
+   - Simultaneous task pickup attempts
+   - Task list corruption recovery
+   - Worktree creation failures
+   - Network/API failures during execution
+
+## Acceptance Criteria
+- [ ] `tasks.md` can be parsed and updated reliably
+- [ ] Cron job correctly identifies and distributes eligible tasks
+- [ ] Agents successfully create and work in isolated git worktrees
+- [ ] Task states transition correctly through the state machine
+- [ ] Multiple agents can work concurrently without conflicts
+- [ ] Failed tasks are properly marked and don't block the system
+- [ ] Successful tasks include commit hashes in their status
+- [ ] System recovers gracefully from failures
+
+## Validation Commands
+Execute these commands to validate the task is complete:
+
+- `python -m py_compile adws/adw_modules/data_models.py` - Verify data models compile
+- `python -m py_compile adws/adw_plan_implement_update_task.py` - Verify workflow compiles
+- `python -m py_compile adws/adw_triggers/adw_trigger_cron_todone.py` - Verify cron trigger compiles
+- `ls -la trees/` - Verify worktree directory structure
+- `cat tasks.md` - Verify task list format and content
+- `./adws/adw_triggers/adw_trigger_cron_todone.py --dry-run` - Test cron job in dry-run mode
+
+## Notes
+- Build the trigger file and the plan implement update as a uv single file script.
+- Ensure all file paths use absolute paths when working with worktrees
+- The cron job should have configurable polling interval (default 5 seconds)
+- Consider using file locking for `tasks.md` updates to prevent race conditions
+- Git worktrees require git 2.5.0 or higher
+</file>
+
+<file path=".env.sample">
+# (REQUIRED) Anthropic Configuration to run Claude Code in programmatic mode
+ANTHROPIC_API_KEY=
+
+# (Optional) Claude Code Path - if 'claude' does not work run 'which claude' and paste that value here
+CLAUDE_CODE_PATH=claude
+
+# (Optional)( Returns claude code to the root directory after every command
+CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=true
+</file>
+
+<file path=".gitignore">
+# Environment variables
+.env
+app/server/.env
+.ports.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.npm
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+!app/server/db/backup.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+trees/
+!trees/README.md
+
+# Claude hooks logs
+logs/
+
+# Agent output directories
+agents/
+
+claude-max-output.json
+claude-max-output.jsonl
+
+storage.json
+
+deep_specs/
+
+screenshots/
+
+# Playwright video recordings
+videos/
+
+# Bun lock files
+bun.lock
+bun.lockb
+
+deep_docs/
+</file>
+
+<file path="README.md">
+# Multi Agent - Todone
+> qqq
+
+## Value Proposition
+
+This codebase showcases the fundamental building blocks of agentic coding.
+
+It contains a bare minimum version of what you need to start building with the new 'Agentic Layer' of your codebase that wraps your 'Application Layer'.
+
+## Codebase Structure
+
+### Agentic Layer
+
+The agent layer of your codebase contains the functionality that is responsible for the agentic coding.
+This is where you template your engineering and teach your agents how to run your codebase.
+
+`.claude/`
+`adws/`
+`ai_docs/`
+`specs/`
+
+### Application Layer
+
+The application layer of your codebase contains your application code.
+This is what your agents will operate on.
+
+`apps/`
+
+## 12 Leverage Points of Agentic Coding
+
+### In Agent (Core Four)
+
+1. Context
+2. Model
+3. Prompt
+4. Tools
+
+### Through Agent
+
+5. Standard Output
+6. Types
+7. Docs
+8. Tests
+9. Architecture
+10. Plans
+11. Templates
+12. AI Developer Workflows
+</file>
+
+<file path="tasks.md">
+# ATL
+
+## Git Worktree validation-workflow
+[✅ 3ecdebb33, 17b93f48] Add a row to apps/sentiment_classification/data/tweets_v1.csv
+[✅ 3ecdebb33, 267fa7a9] build a simple classification model to classify sentiment of a tweet. Use the apps/sentiment_classification/data/tweets_v1.csv dataset.
+[✅ 3ecdebb33, 333fe96b] execute main.py and report the results to main_output.txt next to the main file
+[✅ 981fc7982, 4f87690d] create a new tweets_v2 dataset with 200 rows of a new dataset
+[✅ 981fc7982, 05e5d6f6] add docs so we understand how to use the predict.py method. create these docs in app_docs/tweet_sentiment.md. showcase how we can use it against our tweets_v1 and v2 csv datasets. {opus}
+[✅ 981fc7982, b3ea5f5b] separate predict.py. Create a dedicated jupyter notebook for training the model. Then pass in the model into predict.py as well as a tweet. {grok-4,adw_plan_implement_update_task}. validate your work. 
+[✅ f395e05c6, d2a6998f] Execute the predict.py method against the tweets_v1.csv dataset and report the results to predict_main_output.txt next to the main file
+
+## Git Worktree classify-primary-topic
+[✅ 85e33938e, bbc2a077] Build a new primary topic classifier model. Use the tweets_v1.csv dataset. Use the same approach as the sentiment classifier except build the a new model (notebook) and predictor/classifier (python file) to classify the primary topic of a tweet, given existing topics (training) and a new tweet (prediction). {grok-4-fast,adw_plan_implement_update_task}
+
+## Git Worktree edgecase-tweets
+[✅ df5241b6d, fc290303] Add 25 edge case tweets (emojis, special characters, mixed languages) to data/tweets_edge_cases.csv for testing
+[✅ 8b74b8119, edcc8b72] Add 30 more edge case tweets into data/tweets_edge_cases.csv for testing
+
+## Git Worktree create-topic-filter
+[✅ f640f0fc2, 891ff06d] Generate filtered dataset at data/tweets_tech_topics.csv containing only technology and entertainment topics from tweets_v1.csv
+[✅ 815dad6da, 280149f7] Add 30 new tweets about sports and recreation to expand topic diversity in tweets_v1.csv
+[✅ dc9d481df, ead539f1] Add 15 new tweets about meme and meme culture to expand topic diversity in tweets_v1.csv
+</file>
+
+</files>
