@@ -501,49 +501,67 @@ def main(
             if verbose:
                 print(f"VERBOSE: Ensured specs/ dir exists")
 
-            # Immediately write plan to file if path provided (fallback if slash didn't create)
-            if plan_path and "specs/" in plan_path and plan_path.endswith(".md"):
-                full_plan_path = os.path.join(os.getcwd(), plan_path)
-                if not os.path.exists(full_plan_path):
-                    # Fallback: Write the response output as the plan content
-                    if milestone:
-                        print(f"LOG: Milestone - Writing plan spec fallback to {full_plan_path}")
-                    with open(full_plan_path, 'w') as f:
-                        f.write(plan_response.output)
-                    if verbose:
-                        print(f"VERBOSE: Wrote plan to {full_plan_path} (len: {len(plan_response.output)})")
-                else:
-                    if verbose:
-                        print(f"VERBOSE: Plan file already exists: {full_plan_path}")
+            # Improved fallback: Check if response.output is a path (AI wrote it) or content (write it)
+            import os.path
 
-                # Verify and pass full path to implement
+            if plan_response.output.strip().startswith("specs/") and plan_response.output.strip().endswith(".md") and "Error:" not in plan_response.output:
+                # Assume AI wrote the file; verify existence
+                plan_path = plan_response.output.strip()
+                full_plan_path = os.path.join(os.getcwd(), plan_path)
+                if os.path.exists(full_plan_path) and os.path.getsize(full_plan_path) > 100:  # Basic sanity: >100 chars
+                    console.print(f"\n[bold cyan]Plan spec verified (AI-written) at:[/bold cyan] {plan_path}")
+                    if milestone:
+                        print(f"LOG: Milestone - Plan file verified (AI wrote it)")
+                    # Optional: Read to confirm
+                    try:
+                        with open(full_plan_path, 'r') as f:
+                            content = f.read()
+                            if "## Metadata" in content and len(content) > 500:  # Expect plan format
+                                if verbose:
+                                    print(f"VERBOSE: Plan verified: {len(content)} chars, contains metadata")
+                            else:
+                                raise ValueError("Invalid content")
+                    except Exception as ve:
+                        if verbose:
+                            print(f"VERBOSE: Plan verification failed: {ve}")
+                        workflow_success = False
+                        error_message = f"Plan file exists but invalid: {full_plan_path}"
+                else:
+                    workflow_success = False
+                    error_message = f"AI reported path {plan_path} but file missing or empty"
+            else:
+                # Response is likely content or error; generate default path and write
+                plan_path = f"specs/plan-{adw_id[:6]}-{worktree_name.replace('-', '_')}.md"
+                full_plan_path = os.path.join(os.getcwd(), plan_path)
+                if "Error:" in plan_response.output:
+                    error_message = f"AI plan generation error: {plan_response.output}"
+                    workflow_success = False
+                else:
+                    # Write content
+                    with open(full_plan_path, 'w') as f:
+                        f.write(f"# Plan for Task {adw_id}\n\n{plan_response.output}\n\nGenerated at {datetime.now()}")
+                    if verbose:
+                        print(f"VERBOSE: Fallback wrote plan to {full_plan_path} (len: {len(plan_response.output)})")
+
+                # Verify write
                 if os.path.exists(full_plan_path):
-                    plan_path = os.path.relpath(full_plan_path, os.getcwd())  # Ensure relative path
+                    plan_path = os.path.relpath(full_plan_path, os.getcwd())
                     console.print(f"\n[bold cyan]Plan spec written/verified at:[/bold cyan] {plan_path}")
                     if milestone:
                         print(f"LOG: Milestone - Plan file ready for downstream ({plan_path})")
                 else:
                     workflow_success = False
-                    error_message = f"Failed to write/verify plan file at {full_plan_path}"
+                    error_message = f"Failed to write/verify plan file at {full_plan_path}. Check permissions."
                     console.print(
                         Panel(
-                            f"[bold red]{error_message}[/bold red]\n\n"
-                            "Plan path: {plan_path}. Check permissions or /plan output.",
+                            f"[bold red]{error_message}[/bold red]",
                             title="[bold red]❌ Plan File Write Failed[/bold red]",
                             border_style="red",
                         )
                     )
-            else:
-                # Generate default path if invalid
-                plan_path = f"specs/plan-{adw_id[:6]}-{worktree_name.replace('-', '_')}.md"
-                full_plan_path = os.path.join(os.getcwd(), plan_path)
-                if milestone:
-                    print(f"LOG: Milestone - Invalid path; default {plan_path} and writing fallback")
-                with open(full_plan_path, 'w') as f:
-                    f.write(f"# Plan for Task {adw_id}\n\n{plan_response.output}\n\nGenerated at {datetime.now()}")
-                console.print(f"\n[bold cyan]Default plan spec written at:[/bold cyan] {plan_path}")
-                if verbose:
-                    print(f"VERBOSE: Default plan path set: {plan_path}")
+
+            # Ensure specs/ exists proactively
+            os.makedirs("specs", exist_ok=True)
 
             console.print(
                 Panel(
