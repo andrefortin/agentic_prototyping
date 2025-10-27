@@ -173,6 +173,7 @@ def main(
     verbose: bool,
     milestone: bool,
 ):
+    import os  # Ensure os is available in main to avoid UnboundLocalError
     """Run plan, implement, and update task workflow for Notion-based multi-agent processing."""
     console = Console()
 
@@ -365,7 +366,7 @@ def main(
     # Fetch Notion page for tags (simple API call)
     import requests
     notion_url = f"https://api.notion.com/v1/pages/{page_id}"
-    headers = {"Authorization": f"Bearer {os.getenv('NOTION_INTERNAL_INTEGRATION_SECRET')}", "Notion-Version": "2025-09-03"}
+    headers = {"Authorization": f"Bearer {os.getenv('NOTION_API_KEY')}", "Notion-Version": "2025-09-03"}
     notion_response = requests.get(notion_url, headers=headers)
     if notion_response.status_code == 200:
         notion_data = notion_response.json()
@@ -377,19 +378,22 @@ def main(
                 tags[key.strip()] = value.strip()
             return tags
         tags = extract_tags(content)
-        notion_model = tags.get('model')
+        thinking_model = tags.get('thinking') or tags.get('model')
+        fast_model = tags.get('fast') or tags.get('model')
 
-    model = model or DEFAULT_MODEL or notion_model or 'x-ai/grok-4'  # CLI > env > tag > fallback
+    # Set models: CLI override > tag > fallback
+    thinking_model = thinking_model or 'x-ai/grok-4'  # Thinking for planning
+    fast_model = fast_model or 'x-ai/grok-4-fast'  # Fast for implement/update
 
     if verbose:
-        print(f"VERBOSE: Resolved model: {model} (CLI: {model != DEFAULT_MODEL}, tag: {notion_model})")
+        print(f"VERBOSE: Resolved thinking_model: {thinking_model}, fast_model: {fast_model}")
 
     plan_request = AgentTemplateRequest(
         agent_name=planner_name,
         slash_command=plan_command,
         args=plan_args,
         adw_id=adw_id,
-        model=model,
+        model=plan_model,  # Use thinking model for planning
         working_dir=plan_working_dir,
     )
 
@@ -602,7 +606,8 @@ def main(
                     "page_id": page_id,
                     "slash_command": plan_command,
                     "args": plan_args,
-                    "model": model,
+                    "thinking_model": thinking_model,
+                    "fast_model": fast_model,
                     "prototype": prototype,
                     "app_name": app_name,
                     "working_dir": agent_working_dir,
@@ -763,7 +768,8 @@ def main(
                         "page_id": page_id,
                         "slash_command": "/implement",
                         "args": [plan_path],
-                        "model": model,
+                        "thinking_model": thinking_model,
+                        "fast_model": fast_model,
                         "working_dir": agent_working_dir,
                         "success": implement_response.success,
                         "session_id": implement_response.session_id,
@@ -914,7 +920,8 @@ def main(
                     "page_id": page_id,
                     "slash_command": "/update_notion_task",
                     "args": [page_id, update_status, json.dumps(update_content)],
-                    "model": model,
+                    "thinking_model": thinking_model,
+                    "fast_model": fast_model,
                     "working_dir": os.getcwd(),
                     "success": update_response.success,
                     "session_id": update_response.session_id,
@@ -985,7 +992,8 @@ def main(
                     "worktree_name": worktree_name,
                     "task": task,
                     "page_id": page_id,
-                    "model": model,
+                    "thinking_model": thinking_model,
+                    "fast_model": fast_model,
                     "prototype": prototype,
                     "app_name": app_name,
                     "working_dir": agent_working_dir,
@@ -996,16 +1004,19 @@ def main(
                             "success": plan_response.success if plan_response else False,
                             "session_id": plan_response.session_id if plan_response else None,
                             "agent": planner_name,
+                            "model_used": plan_model,
                         },
                         "implementation": {
                             "success": implement_response.success if implement_response else False,
                             "session_id": implement_response.session_id if implement_response else None,
                             "agent": builder_name if implement_response else None,
+                            "model_used": implement_model,
                         } if implement_response or plan_path else None,
                         "update_notion_task": {
                             "success": update_response.success if update_response else False,
                             "session_id": update_response.session_id if update_response else None,
                             "agent": updater_name,
+                            "model_used": update_model,
                         },
                     },
                     "overall_success": workflow_success,

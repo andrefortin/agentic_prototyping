@@ -11,9 +11,9 @@ statuses = ["Not started", "HIL Review"]
 limit = 3
 
 try:
-    token = os.environ['NOTION_INTERNAL_INTEGRATION_SECRET']
+    token = os.environ['NOTION_API_KEY']
 except KeyError:
-    print(json.dumps([{"error": "NOTION_INTERNAL_INTEGRATION_SECRET not found"}]))
+    print(json.dumps([{"error": "NOTION_API_KEY not found"}]))
     sys.exit(1)
 
 headers = {

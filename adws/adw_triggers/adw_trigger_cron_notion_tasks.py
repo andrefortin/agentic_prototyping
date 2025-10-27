@@ -228,9 +228,9 @@ class NotionTaskManager:
             if self.verbose:
                 print(f"VERBOSE: Warning - database_id length {len(datasource_id)} != 32, using as-is: {datasource_id}")
 
-        API_KEY = os.getenv("NOTION_INTERNAL_INTEGRATION_SECRET")
+        API_KEY = os.getenv("NOTION_API_KEY")
         if not API_KEY:
-            raise ValueError("NOTION_INTERNAL_INTEGRATION_SECRET not set in .env")
+            raise ValueError("NOTION_API_KEY not set in .env")
 
         if self.verbose:
             api_key_masked = API_KEY[:4] + "****" + API_KEY[-4:]
@@ -568,10 +568,10 @@ class NotionTaskManager:
     def fetch_single_task(self, page_id: str) -> Optional[NotionTask]:
         """Fetch a single task by page_id to verify eligibility using direct API."""
         try:
-            API_KEY = os.getenv("NOTION_INTERNAL_INTEGRATION_SECRET")
+            API_KEY = os.getenv("NOTION_API_KEY")
             if not API_KEY:
                 if self.verbose:
-                    print(f"VERBOSE: NOTION_INTERNAL_INTEGRATION_SECRET not set")
+                    print(f"VERBOSE: NOTION_API_KEY not set")
                 return None
 
             HEADERS = {
@@ -710,21 +710,48 @@ class NotionCronTrigger:
         # Track subprocess PIDs for monitoring
         self.active_pids = set()
 
-        # Setup logging
+        # Setup logging with checks at start and before writes
         log_file = os.path.join(os.path.dirname(__file__), "../logs", "notion_cron.log")
-        os.makedirs(os.path.dirname(log_file), exist_ok=True)
+        logs_dir = os.path.dirname(log_file)
+
+        # Check/create at app start
+        if not os.path.exists(logs_dir):
+            os.makedirs(logs_dir)
+            if self.verbose:
+                print(f"VERBOSE: [App Start] Created logs directory: {logs_dir}")
+        else:
+            if self.verbose:
+                print(f"VERBOSE: [App Start] Logs directory exists: {logs_dir}")
+
+        # Function to check/create before any write (e.g., wrap FileHandler)
+        def ensure_logs_dir():
+            if not os.path.exists(logs_dir):
+                os.makedirs(logs_dir)
+                if self.verbose:
+                    print(f"VERBOSE: [Before Write] Created logs directory: {logs_dir}")
+            return log_file
+
         log_level = logging.DEBUG if config.debug else logging.INFO
         if self.verbose:
             log_level = logging.DEBUG
+
+        # Use a custom handler that checks dir before writing
+        class CheckedFileHandler(logging.FileHandler):
+            def __init__(self, filename, mode='a', encoding=None, delay=False):
+                ensure_logs_dir()  # Check/create before init
+                super().__init__(filename, mode, encoding, delay)
+
         logging.basicConfig(
             level=log_level,
             format="%(asctime)s - %(levelname)s - %(message)s",
             handlers=[
-                logging.FileHandler(log_file),
+                CheckedFileHandler(ensure_logs_dir()),  # Use checked handler
                 logging.StreamHandler(sys.stdout),
             ],
         )
         self.logger = logging.getLogger(__name__)
+        # Test initial log to verify
+        self.logger.info("Logging initialized with directory check")
         if self.verbose or self.milestone:
             print(f"LOG: NotionCronTrigger initialized (debug={config.debug}, verbose={self.verbose}, milestone={self.milestone})")
 
@@ -794,7 +821,7 @@ class NotionCronTrigger:
         use_full_workflow = (
             task.should_use_full_workflow() or task.prototype is not None
         )
-        model = task.get_preferred_model()
+        model = task.get_thinking_model()  # Use thinking model for planning tasks
 
         if self.config.dry_run:
             workflow_type = (
@@ -830,8 +857,10 @@ class NotionCronTrigger:
                 combined_task,
                 "--page-id",
                 task.page_id,
-                "--model",
-                model,
+                "--thinking-model",
+                task.get_thinking_model(),
+                "--fast-model",
+                task.get_fast_model(),
             ]
 
             # Add prototype flag if specified

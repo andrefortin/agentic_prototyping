@@ -4,7 +4,7 @@ import sys
 import json
 import requests
 
-# Manual .env parsing for NOTION_INTERNAL_INTEGRATION_SECRET
+# Manual .env parsing for NOTION_API_KEY
 def load_env_manual(filename='.env'):
     if not os.path.exists(filename):
         return
@@ -12,7 +12,7 @@ def load_env_manual(filename='.env'):
         lines = f.readlines()
     for line in lines:
         line = line.strip()
-        if line.startswith('NOTION_INTERNAL_INTEGRATION_SECRET='):
+        if line.startswith('NOTION_API_KEY='):
             key_value = line.split('=', 1)[1]
             if key_value.startswith('"') and key_value.endswith('"'):
                 key_value = key_value[1:-1]
@@ -25,10 +25,10 @@ load_env_manual()
 primary_db_id = '29524ba1-e67b-80cb9eb9e56f6af7e9c0'
 fallback_db_id = '29524ba1-e67b-80e3-bf15-000b74cc2405'
 
-API_KEY = os.getenv('NOTION_INTERNAL_INTEGRATION_SECRET') or os.getenv('MANUAL_NOTION_KEY')
+API_KEY = os.getenv('NOTION_API_KEY') or os.getenv('MANUAL_NOTION_KEY')
 
 if not API_KEY:
-    print(json.dumps({'error': 'NOTION_INTERNAL_INTEGRATION_SECRET not set'}), file=sys.stderr)
+    print(json.dumps({'error': 'NOTION_API_KEY not set'}), file=sys.stderr)
     sys.exit(1)
 
 HEADERS = {

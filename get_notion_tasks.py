@@ -140,9 +140,9 @@ def main(database_input: str, status_filter: str, limit: int, debug: bool, verbo
         print(json.dumps({"error": error_msg}), file=sys.stderr)
         sys.exit(1)
 
-    API_KEY = os.getenv("NOTION_INTERNAL_INTEGRATION_SECRET")
+    API_KEY = os.getenv("NOTION_API_KEY")
     if not API_KEY:
-        print("ERROR: NOTION_INTERNAL_INTEGRATION_SECRET not set in .env", file=sys.stderr)
+        print("ERROR: NOTION_API_KEY not set in .env", file=sys.stderr)
         sys.exit(1)
 
     if verbose or milestone:

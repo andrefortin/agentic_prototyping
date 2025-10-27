@@ -236,9 +236,9 @@ class WorktreeConfig(BaseModel):
 
 class NotionTask(BaseModel):
     """Represents a task from the Notion database."""
-    
+
     page_id: str = Field(..., description="Notion page ID")
-    title: str = Field(..., description="Task title/name") 
+    title: str = Field(..., description="Task title/name")
     status: str = Field(
         "Not started", description="Current task status"
     )  # Flexible string to avoid literal error; validate later if needed
@@ -251,8 +251,11 @@ class NotionTask(BaseModel):
     worktree: Optional[str] = Field(
         None, description="Target worktree name"
     )
-    model: Optional[str] = Field(
-        None, description="Model preference (any LLM model, defaults to x-ai/grok-4-fast)"
+    thinking_model: Optional[str] = Field(
+        None, description="Model for complex reasoning/planning (defaults to x-ai/grok-4)"
+    )
+    fast_model: Optional[str] = Field(
+        None, description="Model for regular prompting (defaults to x-ai/grok-4-fast)"
     )
     workflow_type: Optional[str] = Field(
         None, description="Workflow to use (build/plan-implement)"
@@ -298,9 +301,14 @@ class NotionTask(BaseModel):
         """Extract app context from tags."""
         return self.tags.get("app")
 
-    def get_preferred_model(self) -> str:
-        """Get the preferred model, allowing any specified model or defaulting to x-ai/grok-4-fast."""
-        model = self.model or self.tags.get("model")
+    def get_thinking_model(self) -> str:
+        """Get the thinking model, allowing any specified model or defaulting to x-ai/grok-4."""
+        model = self.thinking_model or self.tags.get("thinking") or self.tags.get("model") or os.getenv("MODEL_THINKING")
+        return model if model else "x-ai/grok-4"
+
+    def get_fast_model(self) -> str:
+        """Get the fast model, allowing any specified model or defaulting to x-ai/grok-4-fast."""
+        model = self.fast_model or self.tags.get("fast") or self.tags.get("model") or os.getenv("MODEL_FAST")
         return model if model else "x-ai/grok-4-fast"
 
     def should_use_full_workflow(self) -> bool:
