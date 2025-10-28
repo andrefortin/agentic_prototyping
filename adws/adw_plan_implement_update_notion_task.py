@@ -237,7 +237,7 @@ def main(
             slash_command="/init_worktree",
             args=[worktree_name, target_directory],
             adw_id=adw_id,
-            model=model_fast,
+            model=model_fast or "x-ai/grok-4-fast",
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -712,7 +712,7 @@ model_default = model_default or tags.get('model-default') or tags.get('model') 
                 slash_command="/implement",
                 args=[plan_path],
                 adw_id=adw_id,
-                model=model_fast,  # Use fast model for implementation
+                model=model_fast or "x-ai/grok-4-fast",  # Use fast model for implementation
                 working_dir=agent_working_dir,
             )
 
@@ -909,7 +909,7 @@ model_default = model_default or tags.get('model-default') or tags.get('model') 
             slash_command="/update_notion_task",
             args=[page_id, update_status, json.dumps(update_content)],
             adw_id=adw_id,
-            model=model_fast,
+            model=model_fast or "x-ai/grok-4-fast",
             working_dir=os.getcwd(),  # Run from project root
         )
 

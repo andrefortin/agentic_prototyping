@@ -211,12 +211,13 @@ def main(
         )
 
         # Create worktree using the init_worktree command
+        agent_model = model_default or model_fast
         init_request = AgentTemplateRequest(
             agent_name="worktree-initializer",
             slash_command="/init_worktree",
             args=[worktree_name, target_directory],
             adw_id=adw_id,
-            model=model_default,  # Use default for init
+            model=agent_model,  # Use default for init
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -458,13 +459,13 @@ def main(
             "worktree_name": worktree_name,
             "result": build_response.output,
         }
-
+        agent_model = model_default or model_fast
         update_request = AgentTemplateRequest(
             agent_name=updater_name,
             slash_command="/update_notion_task",
             args=[page_id, update_status, json.dumps(update_content)],
             adw_id=adw_id,
-            model=model_default,  # Use default model for update
+            model=agent_model,  # Use default or fallback to fast
             working_dir=os.getcwd(),  # Run from project root
         )
 
