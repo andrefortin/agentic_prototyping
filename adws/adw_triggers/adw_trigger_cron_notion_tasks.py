@@ -221,7 +221,7 @@ class NotionTaskManager:
             return []
 
     def _fetch_tasks_from_notion(self, status_filter: List[str], limit: int, debug: bool = False):
-        # Fetch tasks directly from Notion API, modeled after get_notion_tasks.py.
+        # Fetch tasks directly from Notion API, modeled after adws/adw_get_notion_tasks.py.
         # Normalize database_id
         datasource_id = self.database_id
         if len(datasource_id.replace("-", "")) != 32:
@@ -728,7 +728,7 @@ class NotionCronTrigger:
             ensure_dir(dir_path, f"[App Start] {dir_name}")
 
         # Setup logging with checks
-        log_file = os.path.join(os.path.dirname(__file__), "../logs", "notion_cron.log")
+        log_file = os.path.join(project_root, "logs", "notion_cron.log")
         logs_dir = os.path.dirname(log_file)
 
         # Function to ensure logs dir before write

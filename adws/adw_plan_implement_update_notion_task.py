@@ -712,7 +712,7 @@ model_default = model_default or tags.get('model-default') or tags.get('model') 
                 slash_command="/implement",
                 args=[plan_path],
                 adw_id=adw_id,
-                model=model_fast,
+                model=model_fast,  # Use fast model for implementation
                 working_dir=agent_working_dir,
             )
 

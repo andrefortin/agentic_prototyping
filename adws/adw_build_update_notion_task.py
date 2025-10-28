@@ -216,7 +216,7 @@ def main(
             slash_command="/init_worktree",
             args=[worktree_name, target_directory],
             adw_id=adw_id,
-            model=model_default,
+            model=model_default,  # Use default for init
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -280,7 +280,7 @@ def main(
         tags = extract_tags(content)
         model_thinking = model_thinking or tags.get('model-thinking') or tags.get('model') or os.getenv('MODEL_THINKING') or 'x-ai/grok-4'
         model_fast = model_fast or tags.get('model-fast') or tags.get('model') or os.getenv('MODEL_FAST') or 'x-ai/grok-4-fast'
-        model_default = model_default or tags.get('model-default') or tags.get('model') or os.getenv('MODEL_DEFAULT') or 'x-ai/grok-4-fast'
+        model_default = model_default or tags.get('model-default') or tags.get('model') or os.getenv('MODEL_DEFAULT') or model_fast  # Fallback to fast if no default
     else:
         console.print(f"VERBOSE: Failed to fetch Notion tags: {notion_response.text}")
 
@@ -464,7 +464,7 @@ def main(
             slash_command="/update_notion_task",
             args=[page_id, update_status, json.dumps(update_content)],
             adw_id=adw_id,
-            model=model_default,
+            model=model_default,  # Use default model for update
             working_dir=os.getcwd(),  # Run from project root
         )
 
