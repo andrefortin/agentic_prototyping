@@ -143,10 +143,22 @@ def get_current_commit_hash(working_dir: str) -> Optional[str]:
 @click.option("--task", required=True, help="Task description to implement")
 @click.option("--page-id", required=True, help="Notion page ID to update with results")
 @click.option(
-    "--model",
-    type=click.Choice(["x-ai/grok-4-fast", "x-ai/grok-4"]),
-    default="x-ai/grok-4-fast",
-    help="OpenRouter model to use",
+    "--model-thinking",
+    type=str,
+    default=None,
+    help="Thinking model for planning"
+)
+@click.option(
+    "--model-fast",
+    type=str,
+    default=None,
+    help="Fast model for implementation/update"
+)
+@click.option(
+    "--model-default",
+    type=str,
+    default=None,
+    help="Default model fallback"
 )
 @click.option("--verbose", is_flag=True, help="Enable verbose output")
 @click.option("--milestone", is_flag=True, help="Display milestone logs")
@@ -155,7 +167,9 @@ def main(
     worktree_name: str,
     task: str,
     page_id: str,
-    model: str,
+    model_thinking: Optional[str],
+    model_fast: Optional[str],
+    model_default: Optional[str],
     verbose: bool,
     milestone: bool,
 ):
@@ -249,6 +263,27 @@ def main(
     builder_name = f"builder-{worktree_name}"
     updater_name = f"notion-updater-{worktree_name}"
 
+    # Fetch Notion page for tags (simple API call)
+    import requests
+    notion_url = f"https://api.notion.com/v1/pages/{page_id}"
+    headers = {"Authorization": f"Bearer {os.getenv('NOTION_API_KEY')}", "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03")}
+    notion_response = requests.get(notion_url, headers=headers)
+    if notion_response.status_code == 200:
+        notion_data = notion_response.json()
+        content = ''.join([t['plain_text'] for t in notion_data['properties'].get('Content', {}).get('rich_text', [])])
+        def extract_tags(content):  # Inline for simplicity
+            tags = {}
+            for match in re.finditer(r'{{([^:]+):\s*([^}]+)}}', content):
+                key, value = match.groups()
+                tags[key.strip()] = value.strip()
+            return tags
+        tags = extract_tags(content)
+        model_thinking = model_thinking or tags.get('model-thinking') or tags.get('model') or os.getenv('MODEL_THINKING') or 'x-ai/grok-4'
+        model_fast = model_fast or tags.get('model-fast') or tags.get('model') or os.getenv('MODEL_FAST') or 'x-ai/grok-4-fast'
+        model_default = model_default or tags.get('model-default') or tags.get('model') or os.getenv('MODEL_DEFAULT') or 'x-ai/grok-4-fast'
+    else:
+        console.print(f"VERBOSE: Failed to fetch Notion tags: {notion_response.text}")
+
     console.print(
         Panel(
             f"[bold blue]Notion Build-Update Workflow[/bold blue]\n\n"
@@ -256,7 +291,9 @@ def main(
             f"[cyan]Worktree:[/cyan] {worktree_name}\n"
             f"[cyan]Task:[/cyan] {task}\n"
             f"[cyan]Page ID:[/cyan] {page_id}\n"
-            f"[cyan]Model:[/cyan] {model}\n"
+            f"[cyan]Model Thinking:[/cyan] {model_thinking}\n"
+            f"[cyan]Model Fast:[/cyan] {model_fast}\n"
+            f"[cyan]Model Default:[/cyan] {model_default}\n"
             f"[cyan]Working Dir:[/cyan] {os.path.join(worktree_base_path, target_directory)}",
             title="[bold blue]🚀 Workflow Configuration[/bold blue]",
             border_style="blue",
@@ -284,7 +321,7 @@ def main(
         slash_command="/build",
         args=[adw_id, task],
         adw_id=adw_id,
-        model=model,
+        model=model_fast,  # Use fast model for build
         working_dir=agent_working_dir,
     )
 
@@ -380,7 +417,9 @@ def main(
                     "page_id": page_id,
                     "slash_command": "/build",
                     "args": [adw_id, task],
-                    "model": model,
+                    "model_thinking": model_thinking,
+                    "model_fast": model_fast,
+                    "model_default": model_default,
                     "working_dir": agent_working_dir,
                     "success": build_response.success,
                     "session_id": build_response.session_id,
@@ -412,7 +451,9 @@ def main(
             "commit_hash": commit_hash or "",
             "error": error_message or "",
             "timestamp": datetime.now().isoformat(),
-            "model": model,
+            "model_thinking": model_thinking,
+            "model_fast": model_fast,
+            "model_default": model_default,
             "workflow": "build-update",
             "worktree_name": worktree_name,
             "result": build_response.output,
@@ -423,7 +464,7 @@ def main(
             slash_command="/update_notion_task",
             args=[page_id, update_status, json.dumps(update_content)],
             adw_id=adw_id,
-            model=model,
+            model=model_default,
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -512,7 +553,9 @@ def main(
                     "page_id": page_id,
                     "slash_command": "/update_notion_task",
                     "args": [page_id, update_status, json.dumps(update_content)],
-                    "model": model,
+                    "model_thinking": model_thinking,
+                    "model_fast": model_fast,
+                    "model_default": model_default,
                     "working_dir": os.getcwd(),
                     "success": update_response.success,
                     "session_id": update_response.session_id,
@@ -566,7 +609,9 @@ def main(
                     "worktree_name": worktree_name,
                     "task": task,
                     "page_id": page_id,
-                    "model": model,
+                    "model_thinking": model_thinking,
+                    "model_fast": model_fast,
+                    "model_default": model_default,
                     "working_dir": agent_working_dir,
                     "commit_hash": commit_hash,
                     "phases": {

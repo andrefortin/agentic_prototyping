@@ -19,7 +19,7 @@ except KeyError:
 headers = {
     "Authorization": f"Bearer {token}",
     "Content-Type": "application/json",
-    "Notion-Version": "2025-09-03"
+    "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03")
 }
 
 print(f"Debug: Database ID: {database_id}", file=sys.stderr)

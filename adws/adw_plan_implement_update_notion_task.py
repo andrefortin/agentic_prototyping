@@ -47,11 +47,12 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.rule import Rule
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'x-ai/grok-4')
+MODEL_DEFAULT = os.getenv('MODEL_DEFAULT', 'x-ai/grok-4')
 
 # Add the adw_modules directory to the path so we can import agent
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "adw_modules"))
@@ -151,10 +152,22 @@ def get_current_commit_hash(working_dir: str) -> Optional[str]:
 @click.option("--task", required=True, help="Task description to implement")
 @click.option("--page-id", required=True, help="Notion page ID to update with results")
 @click.option(
-    "--model",
+    "--model-thinking",
     type=str,
-    default=DEFAULT_MODEL,
-    help="Model to use (from env, command line, or Notion tags)",
+    default=None,
+    help="Thinking model for planning"
+)
+@click.option(
+    "--model-fast",
+    type=str,
+    default=None,
+    help="Fast model for implementation/update"
+)
+@click.option(
+    "--model-default",
+    type=str,
+    default=None,
+    help="Default model fallback"
 )
 @click.option(
     "--prototype",
@@ -168,7 +181,9 @@ def main(
     worktree_name: str,
     task: str,
     page_id: str,
-    model: str,
+    model_thinking: Optional[str],
+    model_fast: Optional[str],
+    model_default: Optional[str],
     prototype: Optional[str],
     verbose: bool,
     milestone: bool,
@@ -366,7 +381,7 @@ def main(
     # Fetch Notion page for tags (simple API call)
     import requests
     notion_url = f"https://api.notion.com/v1/pages/{page_id}"
-    headers = {"Authorization": f"Bearer {os.getenv('NOTION_API_KEY')}", "Notion-Version": "2025-09-03"}
+    headers = {"Authorization": f"Bearer {os.getenv('NOTION_API_KEY')}", "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03")}
     notion_response = requests.get(notion_url, headers=headers)
     if notion_response.status_code == 200:
         notion_data = notion_response.json()
@@ -500,13 +515,71 @@ def main(
                 print("LOG: Milestone 4 - Planning phase successful")
             plan_path = plan_response.output.strip()
 
-            # Ensure specs/ exists
-            os.makedirs("specs", exist_ok=True)
+            # Ensure specs/ exists in project root
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            specs_dir = os.path.join(project_root, "specs")
+            os.makedirs(specs_dir, exist_ok=True)
             if verbose:
-                print(f"VERBOSE: Ensured specs/ dir exists")
+                print(f"VERBOSE: Ensured {specs_dir} dir exists")
 
             # Improved fallback: Check if response.output is a path (AI wrote it) or content (write it)
             import os.path
+
+            if plan_response.output.strip().startswith("specs/") and plan_response.output.strip().endswith(".md") and "Error:" not in plan_response.output:
+                # Assume AI wrote the file; verify existence
+                plan_path = plan_response.output.strip()
+                full_plan_path = os.path.join(project_root, plan_path)
+                if os.path.exists(full_plan_path) and os.path.getsize(full_plan_path) > 100:  # Basic sanity: >100 chars
+                    console.print(f"\n[bold cyan]Plan spec verified (AI-written) at:[/bold cyan] {plan_path}")
+                    if milestone:
+                        print(f"LOG: Milestone - Plan file verified (AI wrote it)")
+                    # Optional: Read to confirm
+                    try:
+                        with open(full_plan_path, 'r') as f:
+                            content = f.read()
+                            if "## Metadata" in content and len(content) > 500:  # Expect plan format
+                                if verbose:
+                                    print(f"VERBOSE: Plan verified: {len(content)} chars, contains metadata")
+                            else:
+                                raise ValueError("Invalid content")
+                    except Exception as ve:
+                        if verbose:
+                            print(f"VERBOSE: Plan verification failed: {ve}")
+                        workflow_success = False
+                        error_message = f"Plan file exists but invalid: {full_plan_path}"
+                else:
+                    workflow_success = False
+                    error_message = f"AI reported path {plan_path} but file missing or empty"
+            else:
+                # Response is likely content or error; generate default path and write
+                plan_path = f"specs/plan-{adw_id[:6]}-{worktree_name.replace('-', '_')}.md"
+                full_plan_path = os.path.join(project_root, plan_path)
+                if "Error:" in plan_response.output:
+                    error_message = f"AI plan generation error: {plan_response.output}"
+                    workflow_success = False
+                else:
+                    # Write content
+                    with open(full_plan_path, 'w') as f:
+                        f.write(f"# Plan for Task {adw_id}\n\n{plan_response.output}\n\nGenerated at {datetime.now()}")
+                    if verbose:
+                        print(f"VERBOSE: Fallback wrote plan to {full_plan_path} (len: {len(plan_response.output)})")
+
+                # Verify write
+                if os.path.exists(full_plan_path):
+                    plan_path = os.path.relpath(full_plan_path, project_root)
+                    console.print(f"\n[bold cyan]Plan spec written/verified at:[/bold cyan] {plan_path}")
+                    if milestone:
+                        print(f"LOG: Milestone - Plan file ready for downstream ({plan_path})")
+                else:
+                    workflow_success = False
+                    error_message = f"Failed to write/verify plan file at {full_plan_path}. Check permissions."
+                    console.print(
+                        Panel(
+                            f"[bold red]{error_message}[/bold red]",
+                            title="[bold red]❌ Plan File Write Failed[/bold red]",
+                            border_style="red",
+                        )
+                    )
 
             if plan_response.output.strip().startswith("specs/") and plan_response.output.strip().endswith(".md") and "Error:" not in plan_response.output:
                 # Assume AI wrote the file; verify existence
@@ -606,8 +679,9 @@ def main(
                     "page_id": page_id,
                     "slash_command": plan_command,
                     "args": plan_args,
-                    "thinking_model": thinking_model,
-                    "fast_model": fast_model,
+                    "model_thinking": model_thinking,
+                    "model_fast": model_fast,
+                    "model_default": model_default,
                     "prototype": prototype,
                     "app_name": app_name,
                     "working_dir": agent_working_dir,
@@ -768,8 +842,9 @@ def main(
                         "page_id": page_id,
                         "slash_command": "/implement",
                         "args": [plan_path],
-                        "thinking_model": thinking_model,
-                        "fast_model": fast_model,
+                        "model_thinking": model_thinking,
+                        "model_fast": model_fast,
+                        "model_default": model_default,
                         "working_dir": agent_working_dir,
                         "success": implement_response.success,
                         "session_id": implement_response.session_id,
@@ -816,7 +891,9 @@ def main(
             "commit_hash": commit_hash or "",
             "error": error_message or "",
             "timestamp": datetime.now().isoformat(),
-            "model": model,
+            "model_thinking": model_thinking,
+            "model_fast": model_fast,
+            "model_default": model_default,
             "workflow": "plan-implement-update",
             "worktree_name": worktree_name,
             "result": (
@@ -920,8 +997,9 @@ def main(
                     "page_id": page_id,
                     "slash_command": "/update_notion_task",
                     "args": [page_id, update_status, json.dumps(update_content)],
-                    "thinking_model": thinking_model,
-                    "fast_model": fast_model,
+                    "model_thinking": model_thinking,
+                    "model_fast": model_fast,
+                    "model_default": model_default,
                     "working_dir": os.getcwd(),
                     "success": update_response.success,
                     "session_id": update_response.session_id,
@@ -992,8 +1070,9 @@ def main(
                     "worktree_name": worktree_name,
                     "task": task,
                     "page_id": page_id,
-                    "thinking_model": thinking_model,
-                    "fast_model": fast_model,
+                    "model_thinking": model_thinking,
+                    "model_fast": model_fast,
+                    "model_default": model_default,
                     "prototype": prototype,
                     "app_name": app_name,
                     "working_dir": agent_working_dir,
@@ -1004,19 +1083,19 @@ def main(
                             "success": plan_response.success if plan_response else False,
                             "session_id": plan_response.session_id if plan_response else None,
                             "agent": planner_name,
-                            "model_used": plan_model,
+                            "model_used": model_thinking,
                         },
                         "implementation": {
                             "success": implement_response.success if implement_response else False,
                             "session_id": implement_response.session_id if implement_response else None,
                             "agent": builder_name if implement_response else None,
-                            "model_used": implement_model,
+                            "model_used": model_fast,
                         } if implement_response or plan_path else None,
                         "update_notion_task": {
                             "success": update_response.success if update_response else False,
                             "session_id": update_response.session_id if update_response else None,
                             "agent": updater_name,
-                            "model_used": update_model,
+                            "model_used": model_default,
                         },
                     },
                     "overall_success": workflow_success,

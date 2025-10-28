@@ -5,6 +5,7 @@ These models define the structure for tasks, worktrees, and workflow states
 used throughout the ToDone system.
 """
 
+import os
 from typing import List, Optional, Literal, Dict, Any
 from datetime import datetime
 from enum import Enum
@@ -303,12 +304,12 @@ class NotionTask(BaseModel):
 
     def get_thinking_model(self) -> str:
         """Get the thinking model, allowing any specified model or defaulting to x-ai/grok-4."""
-        model = self.thinking_model or self.tags.get("thinking") or self.tags.get("model") or os.getenv("MODEL_THINKING")
+        model = self.thinking_model or self.tags.get("model-thinking") or self.tags.get("model") or os.getenv("MODEL_THINKING") or os.getenv("MODEL_DEFAULT")
         return model if model else "x-ai/grok-4"
 
     def get_fast_model(self) -> str:
         """Get the fast model, allowing any specified model or defaulting to x-ai/grok-4-fast."""
-        model = self.fast_model or self.tags.get("fast") or self.tags.get("model") or os.getenv("MODEL_FAST")
+        model = self.fast_model or self.tags.get("model-fast") or self.tags.get("model") or os.getenv("MODEL_FAST") or os.getenv("MODEL_DEFAULT")
         return model if model else "x-ai/grok-4-fast"
 
     def should_use_full_workflow(self) -> bool:

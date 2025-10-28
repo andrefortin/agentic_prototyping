@@ -223,10 +223,10 @@ class NotionTaskManager:
     def _fetch_tasks_from_notion(self, status_filter: List[str], limit: int, debug: bool = False):
         # Fetch tasks directly from Notion API, modeled after get_notion_tasks.py.
         # Normalize database_id
-        datasource_id = self.database_id.replace("-", "")
-        if len(datasource_id) != 32:
+        datasource_id = self.database_id
+        if len(datasource_id.replace("-", "")) != 32:
             if self.verbose:
-                print(f"VERBOSE: Warning - database_id length {len(datasource_id)} != 32, using as-is: {datasource_id}")
+                print(f"VERBOSE: Warning - database_id length (without hyphens) {len(datasource_id.replace('-', ''))} != 32, using as-is: {datasource_id}")
 
         API_KEY = os.getenv("NOTION_API_KEY")
         if not API_KEY:
@@ -239,7 +239,7 @@ class NotionTaskManager:
 
         HEADERS = {
             "Authorization": f"Bearer {API_KEY}",
-            "Notion-Version": "2025-09-03",
+            "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03"),
             "Content-Type": "application/json",
         }
 
@@ -249,7 +249,7 @@ class NotionTaskManager:
             print(f"VERBOSE: Resolved data_source_id: {ds_id or 'None (using database_id)'}")
 
         # Determine query URL
-        if ds_id and ds_id != datasource_id:
+        if ds_id and ds_id != datasource_id.replace("-", ""):
             query_url = f"https://api.notion.com/v1/data_sources/{ds_id}/query"
             if self.verbose:
                 print(f"VERBOSE: Using data_sources query for {ds_id}")
@@ -576,7 +576,7 @@ class NotionTaskManager:
 
             HEADERS = {
                 "Authorization": f"Bearer {API_KEY}",
-                "Notion-Version": "2025-09-03",
+                "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03"),
             }
 
             page_url = f"https://api.notion.com/v1/pages/{page_id}"
@@ -710,50 +710,92 @@ class NotionCronTrigger:
         # Track subprocess PIDs for monitoring
         self.active_pids = set()
 
-        # Setup logging with checks at start and before writes
+        # Utility function to ensure directory exists
+        def ensure_dir(path, label):
+            if not os.path.exists(path):
+                os.makedirs(path)
+                if self.verbose:
+                    print(f"VERBOSE: Created directory: {path} ({label})")
+            else:
+                if self.verbose:
+                    print(f"VERBOSE: Directory exists: {path} ({label})")
+
+        # Ensure all required directories at project root
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        required_dirs = ["agents", "apps", "logs", "specs", "trees"]
+        for dir_name in required_dirs:
+            dir_path = os.path.join(project_root, dir_name)
+            ensure_dir(dir_path, f"[App Start] {dir_name}")
+
+        # Setup logging with checks
         log_file = os.path.join(os.path.dirname(__file__), "../logs", "notion_cron.log")
         logs_dir = os.path.dirname(log_file)
 
-        # Check/create at app start
-        if not os.path.exists(logs_dir):
-            os.makedirs(logs_dir)
-            if self.verbose:
-                print(f"VERBOSE: [App Start] Created logs directory: {logs_dir}")
-        else:
-            if self.verbose:
-                print(f"VERBOSE: [App Start] Logs directory exists: {logs_dir}")
-
-        # Function to check/create before any write (e.g., wrap FileHandler)
+        # Function to ensure logs dir before write
         def ensure_logs_dir():
-            if not os.path.exists(logs_dir):
-                os.makedirs(logs_dir)
-                if self.verbose:
-                    print(f"VERBOSE: [Before Write] Created logs directory: {logs_dir}")
+            ensure_dir(logs_dir, "[Before Write] logs")
             return log_file
 
         log_level = logging.DEBUG if config.debug else logging.INFO
         if self.verbose:
             log_level = logging.DEBUG
 
-        # Use a custom handler that checks dir before writing
         class CheckedFileHandler(logging.FileHandler):
             def __init__(self, filename, mode='a', encoding=None, delay=False):
-                ensure_logs_dir()  # Check/create before init
+                ensure_logs_dir()
                 super().__init__(filename, mode, encoding, delay)
 
         logging.basicConfig(
             level=log_level,
             format="%(asctime)s - %(levelname)s - %(message)s",
             handlers=[
-                CheckedFileHandler(ensure_logs_dir()),  # Use checked handler
+                CheckedFileHandler(ensure_logs_dir()),
                 logging.StreamHandler(sys.stdout),
             ],
         )
         self.logger = logging.getLogger(__name__)
-        # Test initial log to verify
-        self.logger.info("Logging initialized with directory check")
+        self.logger.info("Logging initialized with directory checks")
+
+        # Update nested keys in .mcp.notion.json with NOTION_VERSION_MCP and NOTION_API_KEY if set
+        mcp_file = os.path.join(project_root, ".mcp.notion.json")
+        if os.path.exists(mcp_file):
+            try:
+                with open(mcp_file, 'r') as f:
+                    mcp_data = json.load(f)
+
+                # Access nested env
+                if "mcpServers" in mcp_data and "notion" in mcp_data["mcpServers"] and "env" in mcp_data["mcpServers"]["notion"]:
+
+                    env = mcp_data["mcpServers"]["notion"]["env"]
+
+                    # Update Notion-Version
+                    notion_version_mcp = os.getenv("NOTION_VERSION_MCP")
+                    if notion_version_mcp and notion_version_mcp.strip():
+                        env["Notion-Version"] = notion_version_mcp
+                        if self.verbose:
+                            print(f"VERBOSE: Updated .mcp.notion.json mcpServers.notion.env Notion-Version to {notion_version_mcp}")
+
+                    # Update NOTION_TOKEN
+                    notion_api_key = os.getenv("NOTION_API_KEY")
+                    if notion_api_key and notion_api_key.strip():
+                        env["NOTION_TOKEN"] = notion_api_key
+                        if self.verbose:
+                            print(f"VERBOSE: Updated .mcp.notion.json mcpServers.notion.env NOTION_TOKEN from NOTION_API_KEY")
+
+                    # Write back if any changes
+                    if notion_version_mcp or notion_api_key:
+                        with open(mcp_file, 'w') as f:
+                            json.dump(mcp_data, f, indent=4)
+
+            except Exception as e:
+                self.logger.warning(f"Failed to update .mcp.notion.json: {str(e)}")
+        else:
+            if self.verbose:
+                print("VERBOSE: .mcp.notion.json not found - skipping update")
+
         if self.verbose or self.milestone:
             print(f"LOG: NotionCronTrigger initialized (debug={config.debug}, verbose={self.verbose}, milestone={self.milestone})")
+
 
     def check_worktree_exists(self, worktree_name: str) -> bool:
         """Check if a worktree already exists."""
@@ -772,8 +814,8 @@ class NotionCronTrigger:
             return True
 
         try:
-            # For this project, always use the current project directory for sparse checkout
-            target_directory = "agentic_prototyping"
+            # For this project, always use the project root for sparse checkout
+            target_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
             request = AgentTemplateRequest(
                 agent_name="worktree-creator",
@@ -857,9 +899,9 @@ class NotionCronTrigger:
                 combined_task,
                 "--page-id",
                 task.page_id,
-                "--thinking-model",
+                "--model-thinking",
                 task.get_thinking_model(),
-                "--fast-model",
+                "--model-fast",
                 task.get_fast_model(),
             ]
 
@@ -872,6 +914,7 @@ class NotionCronTrigger:
                 cmd.append("--verbose")
             if self.milestone:
                 cmd.append("--milestone")
+            # Pass milestone to subprocess for logging
 
             # Create a panel showing the agent execution details
             exec_details = f"[bold]Page ID:[/bold] {task.page_id}\n"

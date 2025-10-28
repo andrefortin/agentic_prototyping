@@ -33,7 +33,7 @@ if not API_KEY:
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
-    "Notion-Version": "2025-09-03",
+    "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03"),
     "Content-Type": "application/json"
 }
 

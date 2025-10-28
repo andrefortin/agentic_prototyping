@@ -159,7 +159,7 @@ def main(database_input: str, status_filter: str, limit: int, debug: bool, verbo
         print(f"LOG: Milestone 1.5 - Setting up headers")
     HEADERS = {
         "Authorization": f"Bearer {API_KEY}",
-        "Notion-Version": "2025-09-03",
+        "Notion-Version": os.getenv("NOTION_VERSION_API", "2025-09-03"),
         "Content-Type": "application/json",
     }
     if verbose:
