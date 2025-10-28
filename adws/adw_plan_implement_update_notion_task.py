@@ -237,7 +237,7 @@ def main(
             slash_command="/init_worktree",
             args=[worktree_name, target_directory],
             adw_id=adw_id,
-            model=model,
+            model=model_fast,
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -317,7 +317,9 @@ def main(
         f"[cyan]Worktree:[/cyan] {worktree_name}\n"
         f"[cyan]Task:[/cyan] {task}\n"
         f"[cyan]Page ID:[/cyan] {page_id}\n"
-        f"[cyan]Model:[/cyan] {model}\n"
+        f"[cyan]Model Thinking:[/cyan] {model_thinking}\n"
+f"[cyan]Model Fast:[/cyan] {model_fast}\n"
+f"[cyan]Model Default:[/cyan] {model_default}\n"
     )
 
     if prototype:
@@ -393,22 +395,21 @@ def main(
                 tags[key.strip()] = value.strip()
             return tags
         tags = extract_tags(content)
-        thinking_model = tags.get('thinking') or tags.get('model')
-        fast_model = tags.get('fast') or tags.get('model')
+        model_thinking = model_thinking or tags.get('model-thinking') or tags.get('model') or os.getenv('MODEL_THINKING') or 'x-ai/grok-4'
+        model_fast = model_fast or tags.get('model-fast') or tags.get('model') or os.getenv('MODEL_FAST') or 'x-ai/grok-4-fast'
+model_default = model_default or tags.get('model-default') or tags.get('model') or os.getenv('MODEL_DEFAULT') or 'x-ai/grok-4-fast'
 
     # Set models: CLI override > tag > fallback
-    thinking_model = thinking_model or 'x-ai/grok-4'  # Thinking for planning
-    fast_model = fast_model or 'x-ai/grok-4-fast'  # Fast for implement/update
-
+        
     if verbose:
-        print(f"VERBOSE: Resolved thinking_model: {thinking_model}, fast_model: {fast_model}")
+        print(f"VERBOSE: Resolved model_thinking: {model_thinking}, model_fast: {model_fast}, model_default: {model_default}")
 
     plan_request = AgentTemplateRequest(
         agent_name=planner_name,
         slash_command=plan_command,
         args=plan_args,
         adw_id=adw_id,
-        model=plan_model,  # Use thinking model for planning
+        model=model_thinking,  # Use thinking model for planning
         working_dir=plan_working_dir,
     )
 
@@ -423,7 +424,7 @@ def main(
     plan_info_table.add_row("Args", f'{adw_id} "{task}"')
     if prototype:
         plan_info_table.add_row("Prototype", prototype)
-    plan_info_table.add_row("Model", model)
+    plan_info_table.add_row("Model", model_thinking)
     plan_info_table.add_row("Agent", planner_name)
 
     console.print(
@@ -711,7 +712,7 @@ def main(
                 slash_command="/implement",
                 args=[plan_path],
                 adw_id=adw_id,
-                model=model,
+                model=model_fast,
                 working_dir=agent_working_dir,
             )
 
@@ -724,7 +725,7 @@ def main(
             implement_info_table.add_row("Phase", "Implementation")
             implement_info_table.add_row("Command", "/implement")
             implement_info_table.add_row("Args", plan_path)
-            implement_info_table.add_row("Model", model)
+            implement_info_table.add_row("Model", model_fast)
             implement_info_table.add_row("Agent", builder_name)
 
             console.print(
@@ -908,7 +909,7 @@ def main(
             slash_command="/update_notion_task",
             args=[page_id, update_status, json.dumps(update_content)],
             adw_id=adw_id,
-            model=model,
+            model=model_fast,
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -922,7 +923,7 @@ def main(
         update_info_table.add_row("Command", "/update_notion_task")
         update_info_table.add_row("Page ID", page_id[:12] + "...")
         update_info_table.add_row("Status", update_status)
-        update_info_table.add_row("Model", model)
+        update_info_table.add_row("Model", model_default)
         update_info_table.add_row("Agent", updater_name)
 
         console.print(

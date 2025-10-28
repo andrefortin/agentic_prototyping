@@ -216,7 +216,7 @@ def main(
             slash_command="/init_worktree",
             args=[worktree_name, target_directory],
             adw_id=adw_id,
-            model=model,
+            model=model_default,
             working_dir=os.getcwd(),  # Run from project root
         )
 
@@ -334,7 +334,7 @@ def main(
     build_info_table.add_row("Phase", "Build")
     build_info_table.add_row("Command", "/build")
     build_info_table.add_row("Args", f'{adw_id} "{task}"')
-    build_info_table.add_row("Model", model)
+    build_info_table.add_row("Model", model_fast)
     build_info_table.add_row("Agent", builder_name)
 
     console.print(
@@ -478,7 +478,7 @@ def main(
         update_info_table.add_row("Command", "/update_notion_task")
         update_info_table.add_row("Page ID", page_id[:12] + "...")
         update_info_table.add_row("Status", update_status)
-        update_info_table.add_row("Model", model)
+        update_info_table.add_row("Model", model_default)
         update_info_table.add_row("Agent", updater_name)
 
         console.print(
